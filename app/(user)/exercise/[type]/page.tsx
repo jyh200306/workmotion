@@ -7,6 +7,19 @@ import { SilhouetteOverlay } from '@/components/camera/SilhouetteOverlay';
 import { speak } from '@/lib/tts';
 import { ExerciseType, ExercisePhase } from '@/types';
 
+async function saveSessionToDb(exType: string, sets: number, durationSec: number) {
+  try {
+    const userStr = localStorage.getItem('wm_user');
+    if (!userStr) return;
+    const { id: userId } = JSON.parse(userStr);
+    await fetch('/api/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, exerciseType: exType, setsCompleted: sets, durationSec }),
+    });
+  } catch { /* Supabase 미연동 시 무시 */ }
+}
+
 const EXERCISE_INFO: Record<ExerciseType, {
   name: string; emoji: string; from: string; to: string; tip: string;
 }> = {
@@ -44,9 +57,10 @@ export default function ExerciseSessionPage({
   const [sets,     setSets]     = useState(0);
   const [timeLeft, setTimeLeft] = useState(SET_SEC);
   const [paused,   setPaused]   = useState(false);
-  const [silOpacity, setSilOpacity] = useState(65); // 실루엣 투명도
+  const [silOpacity, setSilOpacity] = useState(65);
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
 
   const clearTimer = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -73,6 +87,8 @@ export default function ExerciseSessionPage({
       if (next >= TOTAL_SETS) {
         setStage('done');
         speak('모든 세트 완료! 정말 수고하셨습니다!');
+        const durationSec = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        saveSessionToDb(exType, next, durationSec);
       } else {
         setStage('rest');
         speak(`${next}세트 완료! ${REST_SEC}초 쉬어가요.`);
@@ -87,6 +103,7 @@ export default function ExerciseSessionPage({
   }, [startCountdown]);
 
   function handleStart() {
+    startTimeRef.current = Date.now();
     setStage('exercise');
     speak(`${info.name} 시작합니다`);
     startCountdown(SET_SEC, onSetDone);

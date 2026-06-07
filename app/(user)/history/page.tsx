@@ -1,118 +1,140 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// 목 데이터 (Supabase 연동 전)
-const MOCK_HISTORY = [
-  { id: 1, date: '2026-06-07', type: 'squat',   name: '스쿼트',    emoji: '🦵', sets: 3, duration: 62 },
-  { id: 2, date: '2026-06-07', type: 'balance', name: '균형 운동', emoji: '⚖️', sets: 2, duration: 44 },
-  { id: 3, date: '2026-06-06', type: 'calf',    name: '종아리 운동', emoji: '🦶', sets: 3, duration: 68 },
-  { id: 4, date: '2026-06-05', type: 'push',    name: '팔 운동',   emoji: '💪', sets: 3, duration: 55 },
-  { id: 5, date: '2026-06-05', type: 'squat',   name: '스쿼트',    emoji: '🦵', sets: 3, duration: 61 },
-  { id: 6, date: '2026-06-03', type: 'balance', name: '균형 운동', emoji: '⚖️', sets: 3, duration: 70 },
-];
-
-const TYPE_COLOR: Record<string, string> = {
-  squat:   'bg-orange-100 text-orange-700',
-  calf:    'bg-emerald-100 text-emerald-700',
-  push:    'bg-blue-100 text-blue-700',
-  balance: 'bg-violet-100 text-violet-700',
+type SessionRow = {
+  id: string;
+  exercise_type: 'squat' | 'calf' | 'push' | 'balance';
+  sets_completed: number;
+  duration_sec: number;
+  started_at: string;
 };
 
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
-}
+const EXERCISE_LABEL: Record<string, { name: string; emoji: string; color: string }> = {
+  squat:   { name: '스쿼트',    emoji: '🦵', color: 'bg-orange-100 text-orange-700' },
+  calf:    { name: '종아리 운동', emoji: '🦶', color: 'bg-emerald-100 text-emerald-700' },
+  push:    { name: '팔 운동',   emoji: '💪', color: 'bg-blue-100 text-blue-700' },
+  balance: { name: '균형 운동',  emoji: '⚖️', color: 'bg-violet-100 text-violet-700' },
+};
 
-function formatDuration(sec: number) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
+const MOCK: SessionRow[] = [
+  { id:'1', exercise_type:'squat',   sets_completed:3, duration_sec:62, started_at: new Date(Date.now()-3600000).toISOString() },
+  { id:'2', exercise_type:'balance', sets_completed:2, duration_sec:44, started_at: new Date(Date.now()-7200000).toISOString() },
+  { id:'3', exercise_type:'calf',    sets_completed:3, duration_sec:68, started_at: new Date(Date.now()-86400000).toISOString() },
+  { id:'4', exercise_type:'push',    sets_completed:3, duration_sec:55, started_at: new Date(Date.now()-172800000).toISOString() },
+];
+
+function fmt(sec: number) {
+  const m = Math.floor(sec / 60), s = sec % 60;
   return m > 0 ? `${m}분 ${s}초` : `${s}초`;
 }
 
-function groupByDate(list: typeof MOCK_HISTORY) {
-  const map = new Map<string, typeof MOCK_HISTORY>();
-  for (const item of list) {
-    if (!map.has(item.date)) map.set(item.date, []);
-    map.get(item.date)!.push(item);
-  }
+function dateLabel(iso: string) {
+  return new Date(iso).toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' });
+}
+
+function groupByDate(list: SessionRow[]) {
+  const map = new Map<string, SessionRow[]>();
+  list.forEach(s => {
+    const d = s.started_at.slice(0, 10);
+    if (!map.has(d)) map.set(d, []);
+    map.get(d)!.push(s);
+  });
   return [...map.entries()].sort((a, b) => b[0].localeCompare(a[0]));
 }
 
 export default function HistoryPage() {
   const router = useRouter();
-  const groups = groupByDate(MOCK_HISTORY);
-  const totalSessions = MOCK_HISTORY.length;
-  const totalSets = MOCK_HISTORY.reduce((s, h) => s + h.sets, 0);
-  const activeDays = new Set(MOCK_HISTORY.map(h => h.date)).size;
+  const [sessions, setSessions] = useState<SessionRow[]>(MOCK);
+  const [loading,  setLoading]  = useState(true);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('wm_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      setUserName(user.name ?? '');
+      fetch(`/api/sessions?userId=${user.id}`)
+        .then(r => r.json())
+        .then(d => { if (d.sessions?.length) setSessions(d.sessions); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const groups     = groupByDate(sessions);
+  const totalSets  = sessions.reduce((a, s) => a + s.sets_completed, 0);
+  const activeDays = new Set(sessions.map(s => s.started_at.slice(0, 10))).size;
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
+
       {/* 헤더 */}
       <div className="bg-white px-6 pt-12 pb-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={() => router.push('/exercise')}
-            className="text-2xl text-gray-400 active:scale-90 transition-transform"
-          >
-            ←
-          </button>
-          <h1 className="text-4xl font-black text-gray-900">운동 기록</h1>
+          <button onClick={() => router.push('/exercise')} className="text-2xl text-gray-400 active:scale-90 transition-transform">←</button>
+          <div>
+            <h1 className="text-4xl font-black text-gray-900">운동 기록</h1>
+            {userName && <p className="text-xl text-gray-500 mt-0.5">{userName}님의 기록</p>}
+          </div>
         </div>
 
-        {/* 요약 카드 */}
+        {/* 요약 */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: '총 운동', value: totalSessions, unit: '회' },
-            { label: '총 세트', value: totalSets,     unit: '세트' },
-            { label: '운동 일수', value: activeDays,   unit: '일' },
-          ].map(item => (
-            <div key={item.label} className="bg-blue-50 rounded-2xl p-4 text-center">
-              <p className="text-4xl font-black text-blue-700">{item.value}</p>
-              <p className="text-base text-blue-500 mt-0.5">{item.unit}</p>
-              <p className="text-base text-gray-500 mt-1">{item.label}</p>
+            { label:'총 운동',  value: sessions.length, unit:'회'   },
+            { label:'총 세트',  value: totalSets,        unit:'세트' },
+            { label:'운동 일수', value: activeDays,       unit:'일'   },
+          ].map(c => (
+            <div key={c.label} className="bg-blue-50 rounded-2xl p-4 text-center">
+              <p className="text-4xl font-black text-blue-700">{c.value}</p>
+              <p className="text-base text-blue-500">{c.unit}</p>
+              <p className="text-base text-gray-500 mt-1">{c.label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 기록 리스트 */}
+      {/* 리스트 */}
       <div className="flex-1 px-5 py-6 flex flex-col gap-6 overflow-y-auto">
-        {groups.map(([date, items]) => (
+        {loading ? (
+          <p className="text-center text-2xl text-gray-400 mt-10 animate-pulse">불러오는 중...</p>
+        ) : groups.length === 0 ? (
+          <div className="flex flex-col items-center justify-center mt-16 gap-4">
+            <span className="text-8xl">🏃</span>
+            <p className="text-2xl text-gray-400">아직 운동 기록이 없어요</p>
+          </div>
+        ) : groups.map(([date, items]) => (
           <div key={date}>
-            <p className="text-xl font-bold text-gray-500 mb-3 px-1">{formatDate(date)}</p>
+            <p className="text-xl font-bold text-gray-400 mb-3 px-1">{dateLabel(items[0].started_at)}</p>
             <div className="flex flex-col gap-3">
-              {items.map(item => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-4"
-                >
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-gray-50 text-4xl shrink-0">
-                    {item.emoji}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-2xl font-bold text-gray-900">{item.name}</p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className={`text-base px-2.5 py-0.5 rounded-full font-semibold ${TYPE_COLOR[item.type]}`}>
-                        {item.sets}세트
-                      </span>
-                      <span className="text-lg text-gray-400">{formatDuration(item.duration)}</span>
+              {items.map(s => {
+                const ex = EXERCISE_LABEL[s.exercise_type];
+                return (
+                  <div key={s.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-4">
+                    <span className="text-4xl">{ex.emoji}</span>
+                    <div className="flex-1">
+                      <p className="text-2xl font-bold text-gray-900">{ex.name}</p>
+                      <div className="flex gap-2 mt-1">
+                        <span className={`text-base px-2.5 py-0.5 rounded-full font-semibold ${ex.color}`}>{s.sets_completed}세트</span>
+                        <span className="text-lg text-gray-400">{fmt(s.duration_sec)}</span>
+                      </div>
                     </div>
+                    <span className="text-2xl text-green-500">✓</span>
                   </div>
-                  <span className="text-3xl">✓</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
 
-      {/* 바닥 버튼 */}
-      <div className="px-5 pb-10 pt-2 bg-gray-50">
-        <button
-          onClick={() => router.push('/exercise')}
-          className="w-full min-h-[68px] rounded-2xl bg-blue-600 text-white
-                     text-2xl font-bold active:scale-95 transition-transform shadow-md"
-        >
+      {/* 하단 */}
+      <div className="px-5 pb-10 pt-2">
+        <button onClick={() => router.push('/exercise')} className="w-full min-h-[68px] rounded-2xl bg-blue-600 text-white text-2xl font-bold active:scale-95 transition-transform shadow-md">
           운동 하러 가기
         </button>
       </div>
