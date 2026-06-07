@@ -417,10 +417,20 @@ export default function DashboardPage() {
                       const exercisedToday = data.todaySessions.some(s => s.user_id === u.id);
                       return (
                         <div key={u.id} className="flex items-center gap-4 py-4">
-                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                          <button
+                            onClick={() => {
+                              sessionStorage.setItem(`wm_admin_user_${u.id}`, JSON.stringify({ name: u.name }));
+                              router.push(`/dashboard/users/${u.id}`);
+                            }}
+                            className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0 active:scale-90 transition-transform">
                             <span className="text-2xl font-black text-blue-600">{u.name[0]}</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
+                          </button>
+                          <button
+                            onClick={() => {
+                              sessionStorage.setItem(`wm_admin_user_${u.id}`, JSON.stringify({ name: u.name }));
+                              router.push(`/dashboard/users/${u.id}`);
+                            }}
+                            className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity">
                             <div className="flex items-center gap-2">
                               <p className="text-2xl font-bold text-gray-900">{u.name}</p>
                               {u.pin && (
@@ -429,8 +439,8 @@ export default function DashboardPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-lg text-gray-400">{age ? `${age}세` : '나이 미입력'}</p>
-                          </div>
+                            <p className="text-lg text-gray-400">{age ? `${age}세` : '나이 미입력'} · 상세 보기 →</p>
+                          </button>
                           <div className="flex flex-col items-end gap-2 shrink-0">
                             <span className={`text-base px-3 py-1 rounded-full font-semibold ${
                               exercisedToday ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
