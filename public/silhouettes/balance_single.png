@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400">
+  <defs>
+    <filter id="ol" x="-15%" y="-15%" width="130%" height="130%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="e"/>
+      <feFlood flood-color="black" flood-opacity="0.85" result="c"/>
+      <feComposite in="c" in2="e" operator="in" result="o"/>
+      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#ol)" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="100" cy="40" r="28" fill="white" stroke="none"/>
+    <line x1="100" y1="68" x2="100" y2="80" stroke-width="16"/>
+    <line x1="100" y1="80" x2="100" y2="172" stroke-width="40"/>
+    <line x1="82" y1="85" x2="22" y2="82" stroke-width="16"/>
+    <line x1="118" y1="85" x2="178" y2="82" stroke-width="16"/>
+    <line x1="83" y1="175" x2="80" y2="275" stroke-width="22"/>
+    <line x1="80" y1="275" x2="82" y2="362" stroke-width="18"/>
+    <line x1="62" y1="365" x2="94" y2="365" stroke-width="14"/>
+    <line x1="117" y1="175" x2="158" y2="220" stroke-width="22"/>
+    <line x1="158" y1="220" x2="145" y2="282" stroke-width="18"/>
+    <line x1="135" y1="284" x2="158" y2="288" stroke-width="12"/>
+  </g>
+</svg>
