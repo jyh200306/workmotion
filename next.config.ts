@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: "/silhouettes/:file*.png",
         headers: [{ key: "Content-Type", value: "image/svg+xml" }],
       },
+      {
+        source: "/manifest.json",
+        headers: [{ key: "Content-Type", value: "application/manifest+json" }],
+      },
     ];
   },
 };

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { ExerciseType } from '@/types';
 
 const EXERCISES = [
@@ -55,14 +56,32 @@ const today = new Date().toLocaleDateString('ko-KR', {
 });
 
 export default function ExercisePage() {
-  const router = useRouter();
+  const router   = useRouter();
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('wm_name') ?? '';
+    if (!saved) {
+      try { const u = JSON.parse(localStorage.getItem('wm_user') ?? '{}'); setName(u.name ?? ''); }
+      catch { setName(''); }
+    } else { setName(saved); }
+  }, []);
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
       {/* 헤더 */}
       <div className="bg-white px-6 pt-12 pb-6 shadow-sm">
-        <p className="text-xl text-gray-400 mb-1">{today}</p>
-        <h1 className="text-4xl font-black text-gray-900">오늘 운동 선택</h1>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-xl text-gray-400">{today}</p>
+          <button
+            onClick={() => router.push('/profile')}
+            className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center active:scale-90 transition-transform">
+            <span className="text-2xl font-black text-blue-600">{name ? name[0] : '👤'}</span>
+          </button>
+        </div>
+        <h1 className="text-4xl font-black text-gray-900">
+          {name ? `${name}님, 오늘 운동` : '오늘 운동 선택'}
+        </h1>
         <p className="text-xl text-gray-500 mt-1">하고 싶은 운동을 골라주세요</p>
       </div>
 
@@ -98,13 +117,20 @@ export default function ExercisePage() {
       </div>
 
       {/* 하단 푸터 */}
-      <div className="px-6 pb-10 pt-2">
+      <div className="px-6 pb-10 pt-2 flex gap-3">
         <button
           onClick={() => router.push('/history')}
-          className="w-full min-h-[60px] rounded-2xl border-2 border-gray-200 bg-white
+          className="flex-1 min-h-[60px] rounded-2xl border-2 border-gray-200 bg-white
                      text-2xl font-semibold text-gray-500 active:scale-95 transition-transform"
         >
-          📋 운동 기록 보기
+          📋 기록
+        </button>
+        <button
+          onClick={() => router.push('/profile')}
+          className="flex-1 min-h-[60px] rounded-2xl border-2 border-gray-200 bg-white
+                     text-2xl font-semibold text-gray-500 active:scale-95 transition-transform"
+        >
+          👤 프로필
         </button>
       </div>
     </main>
