@@ -3,27 +3,24 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-type UserData = { id: string; name: string; birth_year?: number; facility_id?: string };
+type UserData = { id: string; name: string; birth_year?: number };
 type SessionRow = { exercise_type: string; sets_completed: number; started_at: string };
 
-const EX_META: Record<string, { label: string; emoji: string }> = {
-  squat:   { label: '스쿼트',    emoji: '🦵' },
-  calf:    { label: '종아리 운동', emoji: '🦶' },
-  push:    { label: '팔 운동',   emoji: '💪' },
-  balance: { label: '균형 운동',  emoji: '⚖️' },
+const EX: Record<string, { name: string; emoji: string; dot: string }> = {
+  squat:   { name: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
+  calf:    { name: '종아리 운동', emoji: '🦶', dot: '#00b900' },
+  push:    { name: '팔 운동',   emoji: '💪', dot: '#0064ff' },
+  balance: { name: '균형 운동',  emoji: '⚖️', dot: '#7c3aed' },
 };
 
-const GOAL_LABELS: Record<string, { text: string; emoji: string }> = {
-  health:  { text: '건강 유지',  emoji: '💚' },
-  balance: { text: '균형 향상',  emoji: '⚖️' },
-  strong:  { text: '근력 강화',  emoji: '💪' },
+const GOAL_LABELS: Record<string, string> = {
+  strength: '근력 강화', balance: '균형 향상', health: '건강 유지',
 };
 
 function weekDates() {
-  const today = new Date();
   return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (6 - i));
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
     return d.toISOString().slice(0, 10);
   });
 }
@@ -33,22 +30,19 @@ export default function ProfilePage() {
   const [user,     setUser]     = useState<UserData | null>(null);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [goal,     setGoal]     = useState('');
-  const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
-    const userStr = localStorage.getItem('wm_user');
-    const savedGoal = localStorage.getItem('wm_goal') ?? '';
-    setGoal(savedGoal);
-
-    if (!userStr) { setLoading(false); return; }
-    const u: UserData = JSON.parse(userStr);
-    setUser(u);
-
-    fetch(`/api/sessions?userId=${u.id}`)
-      .then(r => r.json())
-      .then(d => { if (d.sessions) setSessions(d.sessions); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    setGoal(localStorage.getItem('wm_goal') ?? '');
+    try {
+      const u: UserData = JSON.parse(localStorage.getItem('wm_user') ?? '{}');
+      setUser(u);
+      if (u.id) {
+        fetch(`/api/sessions?userId=${u.id}`)
+          .then(r => r.json())
+          .then(d => { if (d.sessions) setSessions(d.sessions); })
+          .catch(() => {});
+      }
+    } catch { /**/ }
   }, []);
 
   function logout() {
@@ -58,77 +52,92 @@ export default function ProfilePage() {
 
   const week      = weekDates();
   const weekDone  = new Set(sessions.map(s => s.started_at.slice(0, 10)));
-  const streak    = (() => {
+  const totalSets = sessions.reduce((a, s) => a + s.sets_completed, 0);
+  const age       = user?.birth_year ? new Date().getFullYear() - user.birth_year : null;
+
+  const streak = (() => {
     let count = 0;
-    const today = new Date().toISOString().slice(0, 10);
-    let cur = new Date(today);
-    while (weekDone.has(cur.toISOString().slice(0, 10))) {
+    const d   = new Date();
+    while (weekDone.has(d.toISOString().slice(0, 10))) {
       count++;
-      cur.setDate(cur.getDate() - 1);
+      d.setDate(d.getDate() - 1);
     }
     return count;
   })();
 
-  const totalSets = sessions.reduce((a, s) => a + s.sets_completed, 0);
-  const favEx     = (() => {
+  const favEx = (() => {
     const cnt: Record<string, number> = {};
     sessions.forEach(s => { cnt[s.exercise_type] = (cnt[s.exercise_type] ?? 0) + 1; });
     return Object.entries(cnt).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
   })();
 
-  const age = user?.birth_year ? new Date().getFullYear() - user.birth_year : null;
-  const goalMeta = GOAL_LABELS[goal];
-
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-[#f2f4f6] flex flex-col">
 
       {/* 헤더 */}
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 px-6 pt-12 pb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => router.push('/exercise')} className="text-white/70 text-2xl active:scale-90 transition-transform">← 뒤로</button>
-        </div>
-        <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-            <span className="text-5xl font-black text-white">
-              {user?.name?.[0] ?? '?'}
-            </span>
+      <div className="bg-white px-6 pt-14 pb-6">
+        <button onClick={() => router.push('/exercise')} className="flex items-center gap-1.5 text-xl text-[#6b7684] mb-5 active:opacity-60 transition-opacity">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          돌아가기
+        </button>
+
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-[#ebf3ff] flex items-center justify-center">
+            <span className="text-2xl font-bold text-[#0064ff]">{user?.name?.[0] ?? 'M'}</span>
           </div>
           <div>
-            <h1 className="text-4xl font-black text-white">{user?.name ?? '이용자'}님</h1>
-            {age && <p className="text-xl text-blue-200 mt-0.5">{age}세</p>}
-            {goalMeta && (
-              <div className="mt-2 bg-white/20 rounded-xl px-3 py-1 inline-flex items-center gap-1.5">
-                <span className="text-lg">{goalMeta.emoji}</span>
-                <span className="text-lg text-white font-semibold">{goalMeta.text}</span>
-              </div>
-            )}
+            <h1 className="text-[26px] font-bold text-[#202632]">{user?.name ?? '이용자'}님</h1>
+            <div className="flex items-center gap-2 mt-1">
+              {age && <p className="text-lg text-[#6b7684]">{age}세</p>}
+              {goal && (
+                <>
+                  {age && <span className="text-[#b0b8c1]">·</span>}
+                  <p className="text-lg text-[#6b7684]">{GOAL_LABELS[goal] ?? goal}</p>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 px-5 py-6 flex flex-col gap-5 overflow-y-auto">
+      <div className="flex-1 px-5 py-5 flex flex-col gap-4 overflow-y-auto">
 
-        {/* 이번 주 달력 */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <p className="text-2xl font-black text-gray-800 mb-4">이번 주 운동</p>
-          <div className="flex justify-between gap-1">
+        {/* 스탯 */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label:'연속 운동', value:`${streak}일`,           icon:'🔥' },
+            { label:'총 운동',  value:`${sessions.length}회`,  icon:'🏃' },
+            { label:'총 세트',  value:`${totalSets}세트`,      icon:'💪' },
+          ].map(c => (
+            <div key={c.label} className="bg-white rounded-2xl border border-[#e5e8eb] p-4 text-center">
+              <p className="text-2xl mb-1">{c.icon}</p>
+              <p className="text-2xl font-bold text-[#202632]">{c.value}</p>
+              <p className="text-sm text-[#b0b8c1] mt-0.5">{c.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* 이번 주 */}
+        <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
+          <p className="text-xl font-bold text-[#202632] mb-4">이번 주 운동</p>
+          <div className="flex gap-1.5">
             {week.map((d, i) => {
-              const done = weekDone.has(d);
+              const done    = weekDone.has(d);
               const isToday = d === new Date().toISOString().slice(0, 10);
-              const dayLabel = ['일','월','화','수','목','금','토'][new Date(d + 'T12:00:00').getDay()];
+              const label   = ['일','월','화','수','목','금','토'][new Date(d + 'T12:00:00').getDay()];
               return (
-                <div key={d} className="flex flex-col items-center gap-1.5 flex-1">
-                  <span className={`text-lg font-semibold ${isToday ? 'text-blue-600' : 'text-gray-400'}`}>
-                    {dayLabel}
-                  </span>
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${
-                    done
-                      ? 'bg-blue-500 text-white shadow-md'
-                      : isToday
-                        ? 'border-2 border-blue-400 text-gray-300'
-                        : 'bg-gray-100 text-gray-300'
+                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                  <p className={`text-sm font-medium ${isToday ? 'text-[#0064ff]' : 'text-[#b0b8c1]'}`}>{label}</p>
+                  <div className={`w-full aspect-square rounded-xl flex items-center justify-center ${
+                    done ? 'bg-[#0064ff]' : isToday ? 'border-2 border-[#0064ff]' : 'bg-[#f2f4f6]'
                   }`}>
-                    {done ? '✓' : '·'}
+                    {done && (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </div>
                 </div>
               );
@@ -136,66 +145,49 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 스탯 카드 */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: '연속 운동', value: streak,           unit:'일',  emoji:'🔥', color:'text-orange-600', bg:'bg-orange-50' },
-            { label: '총 운동',  value: sessions.length,  unit:'회',  emoji:'🏃', color:'text-blue-600',   bg:'bg-blue-50'   },
-            { label: '총 세트',  value: totalSets,        unit:'세트', emoji:'💪', color:'text-green-600',  bg:'bg-green-50'  },
-          ].map(c => (
-            <div key={c.label} className={`${c.bg} rounded-2xl p-4 text-center`}>
-              <span className="text-2xl">{c.emoji}</span>
-              <p className={`text-3xl font-black ${c.color} mt-1`}>{loading ? '…' : c.value}</p>
-              <p className={`text-base ${c.color} opacity-70`}>{c.unit}</p>
-              <p className="text-sm text-gray-500 mt-0.5">{c.label}</p>
+        {/* 선호 운동 */}
+        {favEx && EX[favEx] && (
+          <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-4 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: EX[favEx].dot + '18' }}>
+              <span className="text-2xl">{EX[favEx].emoji}</span>
             </div>
-          ))}
-        </div>
-
-        {/* 좋아하는 운동 */}
-        {favEx && EX_META[favEx] && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
-            <span className="text-5xl">{EX_META[favEx].emoji}</span>
             <div>
-              <p className="text-xl text-gray-500 font-medium">가장 많이 한 운동</p>
-              <p className="text-3xl font-black text-gray-900">{EX_META[favEx].label}</p>
+              <p className="text-lg text-[#6b7684]">가장 많이 한 운동</p>
+              <p className="text-2xl font-bold text-[#202632]">{EX[favEx].name}</p>
             </div>
           </div>
         )}
 
-        {/* 최근 기록 미리보기 */}
+        {/* 최근 기록 */}
         {sessions.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-2xl font-black text-gray-800">최근 기록</p>
-              <button onClick={() => router.push('/history')}
-                className="text-xl text-blue-500 font-semibold active:scale-95 transition-transform">
-                전체 보기 →
+          <div className="bg-white rounded-2xl border border-[#e5e8eb] overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#f2f4f6]">
+              <p className="text-xl font-bold text-[#202632]">최근 기록</p>
+              <button onClick={() => router.push('/history')} className="text-lg text-[#0064ff] font-semibold active:opacity-60 transition-opacity">
+                전체 보기
               </button>
             </div>
-            <div className="flex flex-col divide-y divide-gray-100">
-              {sessions.slice(0, 3).map(s => {
-                const meta = EX_META[s.exercise_type] ?? { emoji:'🏃', label: s.exercise_type };
-                return (
-                  <div key={s.started_at + s.exercise_type} className="flex items-center gap-4 py-3">
-                    <span className="text-3xl">{meta.emoji}</span>
-                    <div className="flex-1">
-                      <p className="text-2xl font-bold text-gray-900">{meta.label}</p>
-                      <p className="text-lg text-gray-500">{s.sets_completed}세트 완료</p>
-                    </div>
-                    <p className="text-lg text-gray-400">
-                      {new Date(s.started_at).toLocaleDateString('ko-KR', { month:'short', day:'numeric' })}
-                    </p>
+            {sessions.slice(0, 3).map((s, idx) => {
+              const ex = EX[s.exercise_type] ?? { emoji:'🏃', name: s.exercise_type, dot: '#6b7684' };
+              return (
+                <div key={s.started_at + idx} className={`flex items-center gap-4 px-5 py-4 ${idx !== Math.min(sessions.length, 3) - 1 ? 'border-b border-[#f2f4f6]' : ''}`}>
+                  <span className="text-2xl">{ex.emoji}</span>
+                  <div className="flex-1">
+                    <p className="text-2xl font-semibold text-[#202632]">{ex.name}</p>
+                    <p className="text-lg text-[#6b7684]">{s.sets_completed}세트</p>
                   </div>
-                );
-              })}
-            </div>
+                  <p className="text-lg text-[#b0b8c1]">
+                    {new Date(s.started_at).toLocaleDateString('ko-KR', { month:'short', day:'numeric' })}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         )}
 
         {/* 로그아웃 */}
         <button onClick={logout}
-          className="w-full min-h-[60px] rounded-2xl border-2 border-gray-200 bg-white text-2xl font-semibold text-gray-400 active:scale-95 transition-transform">
+          className="w-full min-h-[56px] rounded-2xl bg-white border border-[#e5e8eb] text-xl font-semibold text-[#6b7684] active:scale-95 transition-transform mt-2">
           로그아웃
         </button>
       </div>

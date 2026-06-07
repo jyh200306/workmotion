@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const GOALS = [
-  { id: 'strength', emoji: '💪', label: '근력 강화',  desc: '다리·팔 근육을 키워요' },
-  { id: 'balance',  emoji: '⚖️', label: '균형 향상',  desc: '낙상을 예방해요' },
-  { id: 'health',   emoji: '❤️', label: '건강 유지',  desc: '꾸준한 운동 습관을 만들어요' },
+  { id: 'strength', label: '근력 강화',  desc: '다리·팔 근육을 키우고 싶어요', icon: '💪' },
+  { id: 'balance',  label: '균형 향상',  desc: '균형 잡기가 어렵거나 낙상이 걱정돼요', icon: '⚖️' },
+  { id: 'health',   label: '건강 유지',  desc: '꾸준하게 몸을 움직이고 싶어요', icon: '🏃' },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep]       = useState(1);
-  const [name, setName]       = useState('');
-  const [goal, setGoal]       = useState('');
+  const [step,      setStep]      = useState(1);
+  const [name,      setName]      = useState('');
+  const [goal,      setGoal]      = useState('');
   const [nameError, setNameError] = useState('');
 
   function goNext() {
@@ -25,12 +25,9 @@ export default function OnboardingPage() {
       if (!goal) return;
       setStep(3);
     } else {
-      // 완료 → 운동 선택으로
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('wm_onboarded', '1');
-        localStorage.setItem('wm_name', name.trim());
-        localStorage.setItem('wm_goal', goal);
-      }
+      localStorage.setItem('wm_onboarded', '1');
+      localStorage.setItem('wm_name', name.trim());
+      localStorage.setItem('wm_goal', goal);
       router.push('/exercise');
     }
   }
@@ -38,137 +35,132 @@ export default function OnboardingPage() {
   const canNext = step === 1 ? !!name.trim() : step === 2 ? !!goal : true;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-600 to-indigo-700 flex flex-col px-6 py-12 select-none">
+    <main className="min-h-screen bg-white flex flex-col select-none">
 
-      {/* 상단 로고 */}
-      <div className="flex items-center gap-3 mb-10">
-        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-          <span className="text-2xl">🏃</span>
-        </div>
-        <span className="text-3xl font-black text-white">WorkMotion</span>
+      {/* 진행 바 */}
+      <div className="h-1 bg-[#f2f4f6]">
+        <div
+          className="h-full bg-[#0064ff] transition-all duration-300"
+          style={{ width: `${(step / 3) * 100}%` }}
+        />
       </div>
 
-      {/* 단계 표시 */}
-      <div className="flex gap-2 mb-8">
-        {[1, 2, 3].map(s => (
-          <div
-            key={s}
-            className={`h-2 flex-1 rounded-full transition-all duration-300 ${
-              s <= step ? 'bg-white' : 'bg-white/30'
-            }`}
-          />
-        ))}
+      {/* 헤더 */}
+      <div className="px-6 pt-12 pb-6 flex items-center justify-between">
+        <span className="text-xl font-semibold text-[#b0b8c1]">{step} / 3</span>
+        {step > 1 && (
+          <button onClick={() => setStep(s => s - 1)} className="text-xl text-[#6b7684] active:opacity-60 transition-opacity">
+            이전
+          </button>
+        )}
       </div>
 
-      {/* ── STEP 1: 이름 입력 ── */}
-      {step === 1 && (
-        <div className="flex flex-col flex-1 gap-8">
-          <div>
-            <p className="text-3xl font-black text-white mb-1">안녕하세요! 👋</p>
-            <p className="text-xl text-blue-200">WorkMotion에 오신 걸 환영해요.</p>
-            <p className="text-xl text-blue-200 mt-1">먼저 이름을 알려주세요.</p>
-          </div>
+      {/* 콘텐츠 */}
+      <div className="flex-1 px-6 flex flex-col">
 
-          <div className="flex flex-col gap-2">
-            <label className="text-2xl font-bold text-white">이름</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => { setName(e.target.value); setNameError(''); }}
-              placeholder="홍길동"
-              maxLength={10}
-              className="w-full min-h-[68px] rounded-2xl bg-white/15 text-white text-3xl
-                         font-bold px-5 placeholder-white/40 border-2 border-white/20
-                         focus:outline-none focus:border-white/60"
-            />
-            {nameError && <p className="text-red-300 text-xl">{nameError}</p>}
-          </div>
-        </div>
-      )}
-
-      {/* ── STEP 2: 운동 목표 ── */}
-      {step === 2 && (
-        <div className="flex flex-col flex-1 gap-6">
-          <div>
-            <p className="text-3xl font-black text-white mb-1">{name}님의</p>
-            <p className="text-3xl font-black text-white">운동 목표는 무엇인가요?</p>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {GOALS.map(g => (
-              <button
-                key={g.id}
-                onClick={() => setGoal(g.id)}
-                className={`flex items-center gap-5 p-5 rounded-2xl border-2 transition-all duration-150 active:scale-95
-                  ${goal === g.id
-                    ? 'bg-white border-white'
-                    : 'bg-white/10 border-white/20'
-                  }`}
-              >
-                <span className="text-5xl">{g.emoji}</span>
-                <div className="text-left">
-                  <p className={`text-2xl font-black ${goal === g.id ? 'text-blue-700' : 'text-white'}`}>
-                    {g.label}
-                  </p>
-                  <p className={`text-lg ${goal === g.id ? 'text-blue-500' : 'text-white/70'}`}>
-                    {g.desc}
-                  </p>
-                </div>
-                {goal === g.id && (
-                  <span className="ml-auto text-3xl text-blue-600">✓</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── STEP 3: 준비 완료 ── */}
-      {step === 3 && (
-        <div className="flex flex-col flex-1 items-center justify-center gap-8 text-center">
-          <div className="w-36 h-36 bg-white/20 rounded-full flex items-center justify-center">
-            <span className="text-8xl">🎯</span>
-          </div>
-          <div>
-            <p className="text-4xl font-black text-white mb-3">준비 완료!</p>
-            <p className="text-2xl text-blue-200">
-              {name}님, 오늘도 건강한 하루 시작해요.
+        {step === 1 && (
+          <>
+            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-2">
+              안녕하세요
             </p>
-            <div className="mt-6 bg-white/10 rounded-2xl px-6 py-4 text-left space-y-3">
+            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-8">
+              이름이 어떻게 되세요?
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={name}
+                onChange={e => { setName(e.target.value); setNameError(''); }}
+                placeholder="홍길동"
+                maxLength={10}
+                autoFocus
+                className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-[28px] font-semibold
+                           text-[#202632] py-3 placeholder-[#b0b8c1] focus:outline-none
+                           focus:border-[#0064ff] transition-colors"
+              />
+              {nameError && <p className="text-lg text-[#f04452] mt-1">{nameError}</p>}
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-2">
+              {name}님,
+            </p>
+            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-8">
+              운동 목표가 뭔가요?
+            </p>
+
+            <div className="flex flex-col gap-3">
+              {GOALS.map(g => (
+                <button
+                  key={g.id}
+                  onClick={() => setGoal(g.id)}
+                  className={`flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-150 active:scale-[0.98] text-left
+                    ${goal === g.id
+                      ? 'border-[#0064ff] bg-[#ebf3ff]'
+                      : 'border-[#e5e8eb] bg-white'
+                    }`}
+                >
+                  <span className="text-4xl shrink-0">{g.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-2xl font-bold ${goal === g.id ? 'text-[#0064ff]' : 'text-[#202632]'}`}>
+                      {g.label}
+                    </p>
+                    <p className="text-lg text-[#6b7684] mt-0.5">{g.desc}</p>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                    goal === g.id ? 'bg-[#0064ff] border-[#0064ff]' : 'border-[#b0b8c1]'
+                  }`}>
+                    {goal === g.id && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 3 && (
+          <div className="flex flex-col items-center justify-center flex-1 gap-8 text-center pb-8">
+            <div className="w-24 h-24 bg-[#ebf3ff] rounded-full flex items-center justify-center">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+                <path d="M20 6L9 17l-5-5" stroke="#0064ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-[32px] font-bold text-[#202632] mb-3">준비됐어요</p>
+              <p className="text-2xl text-[#6b7684] leading-relaxed">
+                카메라 앞에 서면<br />자세를 실시간으로 안내해 드려요
+              </p>
+            </div>
+            <div className="w-full bg-[#f2f4f6] rounded-2xl p-5 text-left flex flex-col gap-4">
               {[
-                '📷 카메라로 내 동작을 확인해요',
-                '🧍 파란 가이드 라인에 맞춰 운동해요',
-                '🔊 완료 안내음이 세트를 알려줘요',
-              ].map(tip => (
-                <p key={tip} className="text-xl text-white/90">{tip}</p>
+                { icon: '📷', text: '카메라로 내 동작을 확인해요' },
+                { icon: '🧍', text: '파란 가이드 라인에 맞춰 운동해요' },
+                { icon: '🔔', text: '세트 완료 안내음이 울려요' },
+              ].map(t => (
+                <div key={t.text} className="flex items-center gap-3">
+                  <span className="text-2xl">{t.icon}</span>
+                  <p className="text-xl text-[#202632]">{t.text}</p>
+                </div>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* 다음 버튼 */}
-      <div className="mt-auto pt-6">
+      {/* 하단 버튼 */}
+      <div className="px-6 pb-12 pt-4">
         <button
           onClick={goNext}
           disabled={!canNext}
-          className={`w-full min-h-[72px] rounded-2xl text-3xl font-black
-                      active:scale-95 transition-all duration-150
-                      ${canNext
-                        ? 'bg-white text-blue-700 shadow-lg'
-                        : 'bg-white/30 text-white/50'
-                      }`}
+          className="w-full min-h-[60px] rounded-2xl text-2xl font-bold transition-all duration-150
+                     active:scale-95 bg-[#0064ff] text-white disabled:bg-[#b0b8c1]"
         >
-          {step === 3 ? '운동 시작하기 🏃' : '다음'}
+          {step === 3 ? '운동 시작' : '다음'}
         </button>
-        {step > 1 && (
-          <button
-            onClick={() => setStep(s => s - 1)}
-            className="w-full mt-3 py-3 text-xl text-white/60 active:scale-95 transition-transform"
-          >
-            이전으로
-          </button>
-        )}
       </div>
     </main>
   );

@@ -16,10 +16,9 @@ export default function LoginPage() {
     if (loading) return;
     if (key === '←') { setPin(p => p.slice(0, -1)); setError(''); return; }
     if (key === '' || pin.length >= 4) return;
-
     const next = [...pin, key];
     setFilled(next.length - 1);
-    setTimeout(() => setFilled(-1), 150);
+    setTimeout(() => setFilled(-1), 140);
     setPin(next);
     setError('');
     if (next.length === 4) submit(next.join(''));
@@ -29,88 +28,89 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res  = await fetch('/api/auth/pin', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ pin: code }),
+        body: JSON.stringify({ pin: code }),
       });
       const data = await res.json();
-
       if (res.ok) {
         if (data.role === 'admin') {
-          localStorage.setItem('wm_role',     'admin');
+          localStorage.setItem('wm_role', 'admin');
           localStorage.setItem('wm_facility', JSON.stringify(data.facility));
           router.push('/dashboard');
         } else {
           localStorage.setItem('wm_role', 'user');
           localStorage.setItem('wm_user', JSON.stringify(data.user));
-          const onboarded = localStorage.getItem('wm_onboarded');
-          router.push(onboarded ? '/exercise' : '/onboarding');
+          router.push(localStorage.getItem('wm_onboarded') ? '/exercise' : '/onboarding');
         }
       } else {
-        setError(data.error ?? 'PIN이 올바르지 않습니다');
+        setError(data.error ?? 'PIN이 올바르지 않아요');
         setPin([]);
       }
     } catch {
-      // Supabase 미연동 시 목 모드
-      if (code === '9999')      router.push('/dashboard');
+      if (code === '9999') router.push('/dashboard');
       else if (code === '1234') router.push(localStorage.getItem('wm_onboarded') ? '/exercise' : '/onboarding');
-      else { setError('PIN이 올바르지 않습니다'); setPin([]); }
+      else { setError('PIN이 올바르지 않아요'); setPin([]); }
     }
     setLoading(false);
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-b from-blue-600 to-indigo-700 px-6 py-12 select-none">
+    <main className="min-h-screen bg-white flex flex-col select-none">
 
-      {/* 로고 */}
-      <div className="flex flex-col items-center gap-2 pt-4">
-        <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-2">
-          <span className="text-5xl">🏃</span>
+      {/* 상단 영역 */}
+      <div className="flex flex-col items-center pt-20 pb-10 px-8">
+        <div className="w-14 h-14 bg-[#0064ff] rounded-2xl flex items-center justify-center mb-5">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="white" strokeLinejoin="round"/>
+          </svg>
         </div>
-        <h1 className="text-4xl font-black text-white tracking-tight">WorkMotion</h1>
-        <p className="text-xl text-blue-200">스마트 운동 코칭</p>
+        <h1 className="text-[28px] font-bold text-[#202632] tracking-tight">WorkMotion</h1>
+        <p className="text-xl text-[#6b7684] mt-2">PIN 번호 4자리를 눌러주세요</p>
       </div>
 
-      {/* PIN 입력 */}
-      <div className="flex flex-col items-center gap-8 w-full max-w-sm">
-        <p className="text-2xl text-white/90 font-medium">PIN 4자리를 입력해 주세요</p>
+      {/* PIN 도트 */}
+      <div className="flex justify-center gap-5 py-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className={`w-4 h-4 rounded-full transition-all duration-150 ${
+              i < pin.length
+                ? `bg-[#0064ff] ${filled === i ? 'pin-fill' : ''}`
+                : 'bg-[#e5e8eb]'
+            }`}
+          />
+        ))}
+      </div>
 
-        <div className="flex gap-5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className={`w-5 h-5 rounded-full border-2 transition-all duration-200 ${
-              i < pin.length ? `bg-white border-white ${filled === i ? 'pin-fill' : ''}` : 'bg-transparent border-white/50'
-            }`} />
-          ))}
-        </div>
+      {/* 에러 */}
+      <div className="h-9 flex items-center justify-center px-8">
+        {error   && <p className="text-lg text-[#f04452] font-medium">{error}</p>}
+        {loading && <p className="text-lg text-[#b0b8c1]">확인 중</p>}
+      </div>
 
-        <div className="h-8 flex items-center">
-          {error   && <p className="text-red-200 text-xl font-semibold">{error}</p>}
-          {loading && <p className="text-white/70 text-xl animate-pulse">확인 중...</p>}
-        </div>
-
-        <div className="grid grid-cols-3 gap-3 w-full">
+      {/* 키패드 */}
+      <div className="flex-1 flex items-center justify-center px-6">
+        <div className="grid grid-cols-3 gap-3 w-full max-w-xs">
           {KEYS.map((key, i) => (
             <button
               key={i}
               onClick={() => handleKey(key)}
               disabled={key === '' || loading}
-              className={`min-h-[72px] rounded-2xl text-3xl font-bold transition-all duration-100 active:scale-90
+              className={`min-h-[72px] rounded-2xl text-[28px] font-semibold transition-all duration-100 active:scale-90
                 ${key === '' ? 'invisible' : ''}
-                ${key === '←' ? 'bg-white/10 text-white text-2xl' : 'bg-white/15 text-white hover:bg-white/25 shadow-sm'}
+                ${key === '←'
+                  ? 'bg-[#f2f4f6] text-[#6b7684] text-2xl'
+                  : 'bg-[#f2f4f6] text-[#202632] active:bg-[#e5e8eb]'}
                 disabled:opacity-40`}
             >
               {key}
             </button>
           ))}
         </div>
-
-        <div className="flex flex-col items-center gap-1">
-          <p className="text-blue-300 text-lg">이용자 PIN: <span className="font-bold text-white">1234</span></p>
-          <p className="text-blue-400 text-base">관리자 PIN: <span className="font-bold text-blue-200">9999</span></p>
-        </div>
       </div>
 
-      <p className="text-blue-300 text-lg">WorkMotion © 2026</p>
+      <p className="text-center text-lg text-[#b0b8c1] pb-12">WorkMotion © 2026</p>
     </main>
   );
 }
