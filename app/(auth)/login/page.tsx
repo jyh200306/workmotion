@@ -38,8 +38,12 @@ export default function LoginPage() {
   async function submit(code: string) {
     setLoading(true);
     await new Promise(r => setTimeout(r, 700));
-    if (code === '1234') {
-      router.push('/exercise');
+    if (code === '9999') {
+      // 관리자 PIN
+      router.push('/dashboard');
+    } else if (code === '1234') {
+      const onboarded = typeof window !== 'undefined' && localStorage.getItem('wm_onboarded');
+      router.push(onboarded ? '/exercise' : '/onboarding');
     } else {
       setError('PIN이 올바르지 않습니다');
       setPin([]);
@@ -110,7 +114,10 @@ export default function LoginPage() {
           ))}
         </div>
 
-        <p className="text-blue-300 text-lg">테스트 PIN: 1234</p>
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-blue-300 text-lg">이용자 PIN: <span className="font-bold text-white">1234</span></p>
+          <p className="text-blue-400 text-base">관리자 PIN: <span className="font-bold text-blue-200">9999</span></p>
+        </div>
       </div>
 
       <div className="text-blue-300 text-lg">WorkMotion © 2026</div>
