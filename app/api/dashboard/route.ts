@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     .order('name');
 
   // 운동 종목별 집계
-  const breakdown: Record<string, number> = { squat: 0, calf: 0, push: 0, balance: 0 };
+  const breakdown: Record<string, number> = { squat: 0, deadlift: 0, lunge: 0, hip_hinge: 0 };
   sessions.forEach((s: any) => { breakdown[s.exercise_type] = (breakdown[s.exercise_type] ?? 0) + 1; });
 
   const uniqueUsers = new Set(sessions.map((s: any) => s.user_id)).size;

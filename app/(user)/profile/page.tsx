@@ -9,10 +9,10 @@ type UserData = { id: string; name: string; birth_year?: number };
 type SessionRow = { exercise_type: string; sets_completed: number; started_at: string };
 
 const EX: Record<string, { name: string }> = {
-  squat:   { name: '스쿼트' },
-  calf:    { name: '종아리 운동' },
-  push:    { name: '팔 운동' },
-  balance: { name: '균형 운동' },
+  squat:     { name: '스쿼트' },
+  deadlift:  { name: '데드리프트' },
+  lunge:     { name: '런지' },
+  hip_hinge: { name: '힙힌지' },
 };
 
 const GOAL_LABELS: Record<string, string> = {

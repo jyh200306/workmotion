@@ -1,0 +1,303 @@
+# WorkMotion MVP — 4종목 각도 임계값 레퍼런스
+
+> **버전** v0.1 · **작성** 정연호 (PM) · **날짜** 2025-06-16  
+> Claude Code 구현 시 이 파일을 단일 소스로 참조할 것
+
+---
+
+## 개요
+
+| 항목 | 내용 |
+|------|------|
+| MVP 종목 | 스쿼트 · 데드리프트 · 런지 · 힙힌지 |
+| 각도 계산 | `atan2(y3-y2, x3-x2) - atan2(y1-y2, x1-x2)` → degrees |
+| 오차 여유 | MediaPipe 2D 투영 오차 ±5° 반영 |
+| 카운팅 방식 | DOWN +0.5 / UP +0.5 → 합산 1회 |
+| 프레임 경고 | 주요 랜드마크 `visibility < 0.7` 시 운동 일시 정지 |
+
+---
+
+## 공통 랜드마크 인덱스 (MediaPipe Pose)
+
+```
+11 = 왼쪽 어깨     12 = 오른쪽 어깨
+23 = 왼쪽 엉덩이   24 = 오른쪽 엉덩이
+25 = 왼쪽 무릎     26 = 오른쪽 무릎
+27 = 왼쪽 발목     28 = 오른쪽 발목
+31 = 왼쪽 발끝     32 = 오른쪽 발끝
+```
+
+---
+
+## 1. 스쿼트 (Squat)
+
+**사용 랜드마크:** 23(엉덩이) · 25(무릎, 꼭짓점) · 27(발목) · 11(어깨, 척추 보조)
+
+| 조건 구분 | 관절 | 임계값 | 비고 |
+|-----------|------|--------|------|
+| `correct_form` 진입 | 무릎 + 척추 | 무릎 > 160° AND 엉덩이 > 155° | 시작 직립 자세 |
+| DOWN 완료 | 무릎 + 척추 | 무릎 < 90° AND 엉덩이 > 140° | 허벅지 바닥 평행 |
+| UP 완료 | 무릎 | 무릎 > 160° | 완전 기립 |
+| 폼 오류 | 척추(엉덩이) | 엉덩이 < 140° | 허리 굽힘 → Fix Form |
+| progress | 무릎 | `interp(knee, [90, 160], [0, 100])` | 프로그레스 바 |
+
+```python
+SQUAT = {
+    "landmarks": {
+        "primary":   [23, 25, 27],   # 엉덩이-무릎-발목 (메인 각도)
+        "secondary": [11, 23, 25],   # 어깨-엉덩이-무릎 (척추 보조)
+    },
+    "correct_form": {
+        "knee_min":  160,
+        "hip_min":   155,
+    },
+    "down": {
+        "knee_max":  90,
+        "hip_min":   140,
+    },
+    "up": {
+        "knee_min":  160,
+    },
+    "form_error": {
+        "hip_below": 140,            # 허리 굽힘 감지
+        "message":   "허리를 펴세요 — 등이 굽혀졌습니다",
+    },
+    "progress": {
+        "angle_key": "knee",
+        "in_range":  [90, 160],
+        "out_range": [0, 100],
+    },
+    "senior_override": {
+        "down.knee_max":     110,    # 완화: 90° → 110°
+        "form_error.hip_below": 125, # 완화: 140° → 125°
+    },
+}
+```
+
+---
+
+## 2. 데드리프트 (Deadlift)
+
+**사용 랜드마크:** 11(어깨) · 23(엉덩이, 꼭짓점) · 25(무릎) · 27(발목)
+
+| 조건 구분 | 관절 | 임계값 | 비고 |
+|-----------|------|--------|------|
+| `correct_form` 진입 | 엉덩이 + 무릎 | 엉덩이 > 160° AND 무릎 > 160° | 완전 직립 |
+| DOWN 완료 | 엉덩이 + 무릎 | 엉덩이 < 70° AND 무릎 > 150° | 바닥 위치 |
+| UP 완료 | 엉덩이 + 무릎 | 엉덩이 > 160° AND 무릎 > 160° | 직립 복귀 |
+| 폼 오류 | 무릎 | 무릎 < 140° | 스쿼트 혼입 감지 |
+| progress | 엉덩이 | `interp(hip, [60, 170], [100, 0])` | 프로그레스 바 (역방향) |
+
+```python
+DEADLIFT = {
+    "landmarks": {
+        "primary":   [11, 23, 25],   # 어깨-엉덩이-무릎 (메인 각도)
+        "secondary": [23, 25, 27],   # 엉덩이-무릎-발목 (무릎 보조)
+    },
+    "correct_form": {
+        "hip_min":   160,
+        "knee_min":  160,
+    },
+    "down": {
+        "hip_max":   70,
+        "knee_min":  150,
+    },
+    "up": {
+        "hip_min":   160,
+        "knee_min":  160,
+    },
+    "form_error": {
+        "knee_below": 140,           # 스쿼트 동작 혼입
+        "message":    "무릎을 펴세요 — 스쿼트가 아닌 데드리프트입니다",
+    },
+    "progress": {
+        "angle_key": "hip",
+        "in_range":  [60, 170],
+        "out_range": [100, 0],       # 역방향: 숙일수록 100%
+    },
+    "senior_override": {},           # 데드리프트는 시니어 완화 없음 (난이도 제한)
+}
+```
+
+---
+
+## 3. 런지 (Lunge)
+
+**사용 랜드마크:** 23·24(양측 엉덩이) · 25·26(양측 무릎, 꼭짓점) · 27·28(양측 발목)  
+**앞다리 자동 판별:** `front_is_left = lm[27].x < lm[28].x`
+
+| 조건 구분 | 관절 | 임계값 | 비고 |
+|-----------|------|--------|------|
+| `correct_form` 진입 | 앞 + 뒷 무릎 | 앞 > 160° AND 뒤 > 160° | 양발 직립 |
+| DOWN 완료 | 앞 + 뒷 무릎 | 앞 < 100° AND 뒤 < 105° | 양 무릎 90° 수준 |
+| UP 완료 | 앞 무릎 | 앞 무릎 > 160° | 상승 복귀 |
+| 폼 오류 | 앞 무릎 | 앞 무릎 < 80° | 발끝 돌출 위험 |
+| progress | 앞 무릎 | `interp(front_knee, [90, 170], [0, 100])` | 프로그레스 바 |
+
+```python
+LUNGE = {
+    "landmarks": {
+        "left":  [23, 25, 27],       # 왼쪽 엉덩이-무릎-발목
+        "right": [24, 26, 28],       # 오른쪽 엉덩이-무릎-발목
+        "front_detect": [27, 28],    # x좌표 비교로 앞다리 판별
+    },
+    "front_leg_logic": "front_is_left = lm[27].x < lm[28].x",
+    "correct_form": {
+        "front_knee_min": 160,
+        "back_knee_min":  160,
+    },
+    "down": {
+        "front_knee_max": 100,
+        "back_knee_max":  105,
+    },
+    "up": {
+        "front_knee_min": 160,
+    },
+    "form_error": {
+        "front_knee_below": 80,      # 앞무릎 발끝 돌출
+        "message":          "앞 무릎이 발끝보다 앞으로 나왔습니다",
+    },
+    "progress": {
+        "angle_key": "front_knee",
+        "in_range":  [90, 170],
+        "out_range": [0, 100],
+    },
+    "senior_override": {
+        "down.front_knee_max": 115,  # 완화: 100° → 115°
+        "down.back_knee_max":  120,
+    },
+}
+```
+
+---
+
+## 4. 힙 힌지 (Hip Hinge)
+
+**사용 랜드마크:** 11(어깨) · 23(엉덩이, 꼭짓점) · 25(무릎) · 27(발목)
+
+| 조건 구분 | 관절 | 임계값 | 비고 |
+|-----------|------|--------|------|
+| `correct_form` 진입 | 엉덩이 + 무릎 | 엉덩이 > 170° AND 무릎 > 155° | 직립, 무릎 거의 핌 |
+| 힌지 목표 범위 | 엉덩이 | 45° ≤ 엉덩이 ≤ 70° | 햄스트링 스트레치 |
+| UP 완료 | 엉덩이 | 엉덩이 > 170° | 직립 복귀 |
+| 폼 오류 A | 무릎 | 무릎 < 150° | 스쿼트 혼입 / 척추 굴곡 |
+| 폼 오류 B | 엉덩이 | 엉덩이 < 45° | 과도한 숙임, 허리 과부하 |
+| progress | 엉덩이 | `interp(hip, [45, 175], [100, 0])` | 프로그레스 바 (역방향) |
+
+```python
+HIP_HINGE = {
+    "landmarks": {
+        "primary":   [11, 23, 25],   # 어깨-엉덩이-무릎 (메인 각도)
+        "secondary": [23, 25, 27],   # 엉덩이-무릎-발목 (무릎 고정 확인)
+    },
+    "correct_form": {
+        "hip_min":   170,
+        "knee_min":  155,
+    },
+    "down": {
+        "hip_target_min": 45,
+        "hip_target_max": 70,        # 이 범위가 "완료" 구간
+    },
+    "up": {
+        "hip_min":   170,
+    },
+    "form_error": {
+        "knee_below":    150,        # 스쿼트 동작 혼입
+        "hip_below":     45,         # 과도 숙임
+        "message_knee":  "무릎을 펴세요 — 힙힌지는 무릎을 고정합니다",
+        "message_hip":   "너무 많이 숙였습니다 — 허리에 무리가 올 수 있습니다",
+    },
+    "progress": {
+        "angle_key": "hip",
+        "in_range":  [45, 175],
+        "out_range": [100, 0],       # 역방향: 숙일수록 100%
+    },
+    "senior_override": {
+        "down.hip_target_min": 60,   # 완화: 45° → 60°
+        "down.hip_target_max": 75,
+    },
+}
+```
+
+---
+
+## 통합 딕셔너리
+
+```python
+THRESHOLDS = {
+    "squat":     SQUAT,
+    "deadlift":  DEADLIFT,
+    "lunge":     LUNGE,
+    "hip_hinge": HIP_HINGE,
+}
+
+SENIOR_AGE_THRESHOLD = 60   # 이 나이 이상 → senior_override 자동 적용
+
+def get_threshold(exercise: str, key: str, is_senior: bool = False):
+    """
+    임계값을 반환. 시니어 모드 시 override 값 우선 적용.
+
+    Args:
+        exercise:  'squat' | 'deadlift' | 'lunge' | 'hip_hinge'
+        key:       점표기법 키 (예: 'down.knee_max')
+        is_senior: 시니어 모드 여부
+
+    Returns:
+        임계값 (int | float)
+
+    Example:
+        get_threshold('squat', 'down.knee_max', is_senior=True)  # → 110
+        get_threshold('squat', 'down.knee_max', is_senior=False) # → 90
+    """
+    cfg = THRESHOLDS[exercise]
+    if is_senior and key in cfg.get("senior_override", {}):
+        return cfg["senior_override"][key]
+    # 점표기법 탐색
+    parts = key.split(".")
+    val = cfg
+    for p in parts:
+        val = val[p]
+    return val
+```
+
+---
+
+## 시니어 모드 완화 임계값 요약
+
+| 종목 | 항목 | 일반 | 시니어 (60세 이상) |
+|------|------|------|--------------------|
+| 스쿼트 | DOWN 무릎 임계값 | < 90° | < 110° |
+| 스쿼트 | 폼 오류 엉덩이 | < 140° | < 125° |
+| 런지 | DOWN 앞 무릎 | < 100° | < 115° |
+| 힙힌지 | 힌지 목표 하한 | 45° | 60° |
+| 데드리프트 | — | 완화 없음 | 완화 없음 (난이도 제한) |
+
+---
+
+## 프레임 경고 조건
+
+```python
+FRAME_WARNING = {
+    "visibility_threshold": 0.7,
+    "watch_landmarks": [11, 12, 23, 24, 25, 26],   # 어깨·엉덩이·무릎
+    "calf_raise_extra": {                           # 카프레이즈 전용 (MVP 외)
+        "landmark": 31,
+        "y_ratio":  0.95,                           # frame_height × 0.95
+    },
+    "resume_countdown_sec": 3,
+    "message": "뒤로 물러나세요 — 전신이 카메라에 들어와야 합니다",
+}
+```
+
+---
+
+## 변경 이력
+
+| 버전 | 날짜 | 변경 내용 | 작성자 |
+|------|------|-----------|--------|
+| v0.1 | 2025-06-16 | 최초 작성 — MVP 4종목 임계값 정의 | 정연호 |
+
+---
+
+*이 파일은 PRD `WorkMotion_PRD_v0.1.docx` 4절 기술 사양의 구현 레퍼런스입니다.*  
+*임계값 변경 시 PRD와 이 파일을 동시에 업데이트할 것.*

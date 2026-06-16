@@ -18,7 +18,7 @@ export type User = {
 export type Session = {
   id: string;
   user_id: string;
-  exercise_type: 'squat' | 'calf' | 'push' | 'balance';
+  exercise_type: 'squat' | 'deadlift' | 'lunge' | 'hip_hinge';
   sets_completed: number;
   duration_sec: number;
   comment_emoji: string | null;

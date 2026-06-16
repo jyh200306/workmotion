@@ -6,10 +6,10 @@ import { ExerciseType } from '@/types';
 import { ExerciseIcon } from '@/components/Icon';
 
 const EXERCISES = [
-  { type: 'squat'   as ExerciseType, name: '스쿼트',    desc: '하체 근력 · 무릎 강화' },
-  { type: 'calf'    as ExerciseType, name: '종아리 운동', desc: '균형 · 혈액 순환 향상' },
-  { type: 'push'    as ExerciseType, name: '팔 운동',    desc: '상체 근력 · 어깨 강화' },
-  { type: 'balance' as ExerciseType, name: '균형 운동',  desc: '낙상 예방 · 코어 강화' },
+  { type: 'squat'     as ExerciseType, name: '스쿼트',     desc: '하체 근력 · 무릎 강화' },
+  { type: 'deadlift'  as ExerciseType, name: '데드리프트',  desc: '엉덩이 · 등 후면 강화' },
+  { type: 'lunge'     as ExerciseType, name: '런지',       desc: '다리 균형 · 하체 안정' },
+  { type: 'hip_hinge' as ExerciseType, name: '힙힌지',     desc: '엉덩이 · 햄스트링 활성' },
 ];
 
 const todayStr = new Date().toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'long' });

@@ -23,27 +23,27 @@ async function saveSessionToDb(exType: string, sets: number, durationSec: number
 }
 
 const EX_INFO: Record<ExerciseType, { name: string }> = {
-  squat:   { name: '스쿼트' },
-  calf:    { name: '종아리 운동' },
-  push:    { name: '팔 운동' },
-  balance: { name: '균형 운동' },
+  squat:     { name: '스쿼트' },
+  deadlift:  { name: '데드리프트' },
+  lunge:     { name: '런지' },
+  hip_hinge: { name: '힙힌지' },
 };
 
 const TIPS: Record<ExerciseType, string> = {
-  squat:   '등을 곧게 펴고 천천히 앉아주세요',
-  calf:    '발뒤꿈치를 천천히 올리세요',
-  push:    '팔을 천천히 뻗었다 당기세요',
-  balance: '한 발씩 천천히 들어올리세요',
+  squat:     '등을 곧게 펴고 천천히 앉아주세요',
+  deadlift:  '무릎은 고정하고 엉덩이를 뒤로 빼며 숙이세요',
+  lunge:     '앞 무릎이 발끝을 넘지 않게 천천히 내려가세요',
+  hip_hinge: '무릎은 펴고 엉덩이만 뒤로 빼며 숙이세요',
 };
 
-const VALID: ExerciseType[] = ['squat', 'calf', 'push', 'balance'];
+const VALID: ExerciseType[] = ['squat', 'deadlift', 'lunge', 'hip_hinge'];
 const TOTAL_SETS = 3;
 const SET_SEC    = 20;
 const REST_SEC   = 8;
 
 // 한 세트 목표 반복 횟수 — 자세 인식이 동작할 때 이 횟수를 채우면 세트 완료
 const REPS_PER_SET: Record<ExerciseType, number> = {
-  squat: 8, calf: 12, push: 10, balance: 6,
+  squat: 8, deadlift: 8, lunge: 10, hip_hinge: 10,
 };
 
 type Stage = 'ready' | 'exercise' | 'rest' | 'done';
@@ -62,6 +62,15 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   const [timeLeft,   setTimeLeft]   = useState(SET_SEC);
   const [paused,     setPaused]     = useState(false);
   const [silOpacity, setSilOpacity] = useState(65);
+  const [isSenior,   setIsSenior]   = useState(false); // 60세 이상 → 완화 임계값 (mvp.md)
+
+  // 이용자 출생년도로 시니어 여부 판정
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('wm_user') ?? '{}');
+      if (u.birth_year && new Date().getFullYear() - u.birth_year >= 60) setIsSenior(true);
+    } catch { /**/ }
+  }, []);
 
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -83,6 +92,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
     exercise: exType,
     videoRef,
     active: stage === 'exercise' && !paused,
+    isSenior,
     onRep: handleRep,
   });
 

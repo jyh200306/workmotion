@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS sessions (
   id              UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id         UUID REFERENCES users(id) ON DELETE CASCADE,
-  exercise_type   TEXT CHECK (exercise_type IN ('squat','calf','push','balance')) NOT NULL,
+  exercise_type   TEXT CHECK (exercise_type IN ('squat','deadlift','lunge','hip_hinge')) NOT NULL,
   sets_completed  INTEGER DEFAULT 0,
   duration_sec    INTEGER DEFAULT 0,
   comment_emoji   TEXT,

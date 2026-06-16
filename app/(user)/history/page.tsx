@@ -7,24 +7,24 @@ import { ExerciseIcon, RunIcon } from '@/components/Icon';
 
 type SessionRow = {
   id: string;
-  exercise_type: 'squat' | 'calf' | 'push' | 'balance';
+  exercise_type: 'squat' | 'deadlift' | 'lunge' | 'hip_hinge';
   sets_completed: number;
   duration_sec: number;
   started_at: string;
 };
 
 const EX: Record<string, { name: string }> = {
-  squat:   { name: '스쿼트' },
-  calf:    { name: '종아리 운동' },
-  push:    { name: '팔 운동' },
-  balance: { name: '균형 운동' },
+  squat:     { name: '스쿼트' },
+  deadlift:  { name: '데드리프트' },
+  lunge:     { name: '런지' },
+  hip_hinge: { name: '힙힌지' },
 };
 
 const MOCK: SessionRow[] = [
-  { id:'1', exercise_type:'squat',   sets_completed:3, duration_sec:62, started_at: new Date(Date.now()-3600000).toISOString() },
-  { id:'2', exercise_type:'balance', sets_completed:2, duration_sec:44, started_at: new Date(Date.now()-7200000).toISOString() },
-  { id:'3', exercise_type:'calf',    sets_completed:3, duration_sec:68, started_at: new Date(Date.now()-86400000).toISOString() },
-  { id:'4', exercise_type:'push',    sets_completed:3, duration_sec:55, started_at: new Date(Date.now()-172800000).toISOString() },
+  { id:'1', exercise_type:'squat',     sets_completed:3, duration_sec:62, started_at: new Date(Date.now()-3600000).toISOString() },
+  { id:'2', exercise_type:'hip_hinge', sets_completed:2, duration_sec:44, started_at: new Date(Date.now()-7200000).toISOString() },
+  { id:'3', exercise_type:'deadlift',  sets_completed:3, duration_sec:68, started_at: new Date(Date.now()-86400000).toISOString() },
+  { id:'4', exercise_type:'lunge',     sets_completed:3, duration_sec:55, started_at: new Date(Date.now()-172800000).toISOString() },
 ];
 
 function fmt(sec: number) {

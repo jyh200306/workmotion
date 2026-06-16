@@ -11,6 +11,7 @@ import type { PoseLandmarker } from '@mediapipe/tasks-vision';
 import { ExerciseType } from '@/types';
 import {
   analyzePose,
+  isFrameVisible,
   RepCounter,
   type Landmark,
 } from '@/lib/poseAnalysis';
@@ -34,10 +35,11 @@ interface Options {
   exercise: ExerciseType;
   videoRef: RefObject<HTMLVideoElement | null>;
   active: boolean;       // 운동 중일 때만 분석
+  isSenior?: boolean;    // 60세 이상 → 완화 임계값 적용 (mvp.md)
   onRep?: (total: number) => void;
 }
 
-export function usePoseCounter({ exercise, videoRef, active, onRep }: Options) {
+export function usePoseCounter({ exercise, videoRef, active, isSenior = false, onRep }: Options) {
   const [state, setState] = useState<PoseCounterState>({
     ready: false, reps: 0, progress: 0,
     feedback: '준비하세요', correctForm: false, error: null,
@@ -50,11 +52,13 @@ export function usePoseCounter({ exercise, videoRef, active, onRep }: Options) {
   const lastVideoTimeRef = useRef(-1);
   const repsRef = useRef(0);
 
-  // 콜백/운동종류를 ref 로 안정화 — 루프가 항상 최신 값을 보되 재구독 없이 동작
+  // 콜백/운동종류/시니어를 ref 로 안정화 — 루프가 항상 최신 값을 보되 재구독 없이 동작
   const onRepRef = useRef(onRep);
   const exerciseRef = useRef(exercise);
+  const seniorRef = useRef(isSenior);
   useEffect(() => { onRepRef.current = onRep; }, [onRep]);
   useEffect(() => { exerciseRef.current = exercise; }, [exercise]);
+  useEffect(() => { seniorRef.current = isSenior; }, [isSenior]);
 
   // ── 모델 1회 로드 ──────────────────────────────────────
   useEffect(() => {
@@ -105,8 +109,13 @@ export function usePoseCounter({ exercise, videoRef, active, onRep }: Options) {
           const result = landmarker.detectForVideo(video, performance.now());
           const lms: Landmark[] | undefined = result?.landmarks?.[0];
 
-          if (lms && lms.length > 0) {
-            const a = analyzePose(exerciseRef.current, lms);
+          if (!lms || lms.length === 0) {
+            setState(s => ({ ...s, feedback: '화면 안에 들어와 주세요', correctForm: false }));
+          } else if (!isFrameVisible(lms)) {
+            // 주요 랜드마크가 가려짐 → 운동 일시정지, 카운트 안 함 (mvp.md FRAME_WARNING)
+            setState(s => ({ ...s, feedback: '뒤로 물러나세요 — 전신이 카메라에 들어와야 합니다', correctForm: false }));
+          } else {
+            const a = analyzePose(exerciseRef.current, lms, seniorRef.current);
             const completed = counterRef.current.update(a.endpoint);
             if (completed) {
               repsRef.current += 1;
@@ -119,8 +128,6 @@ export function usePoseCounter({ exercise, videoRef, active, onRep }: Options) {
               feedback: a.feedback,
               correctForm: a.correctForm,
             }));
-          } else {
-            setState(s => ({ ...s, feedback: '화면 안에 들어와 주세요', correctForm: false }));
           }
         }
       }

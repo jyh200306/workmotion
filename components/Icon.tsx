@@ -21,7 +21,7 @@ const base = (size: number, className?: string) => ({
 
 // ── 운동별 아이콘 ──────────────────────────────────────────
 function SquatIcon({ size = 24, className }: IconProps) {
-  // 다리 굽힘(스쿼트) 추상화
+  // 무릎 굽힘(스쿼트) — 양다리 굽힌 측면 실루엣
   return (
     <svg {...base(size, className)}>
       <circle cx="12" cy="4.5" r="2" />
@@ -32,48 +32,52 @@ function SquatIcon({ size = 24, className }: IconProps) {
   );
 }
 
-function CalfIcon({ size = 24, className }: IconProps) {
-  // 발뒤꿈치 들기(까치발)
+function DeadliftIcon({ size = 24, className }: IconProps) {
+  // 데드리프트 — 상체 숙여 바벨 잡는 측면 실루엣
   return (
     <svg {...base(size, className)}>
-      <path d="M9 3v9" />
-      <path d="M9 12c0 3 1.5 5 4.5 5.5L18 18" />
-      <path d="M6 21h9" />
-      <path d="M9 12l-3 1" />
+      <circle cx="7" cy="5" r="2" />
+      <path d="M7 7l3 5.5h4" />        {/* 숙인 상체 → 엉덩이 */}
+      <path d="M14 12.5v7" />          {/* 다리(거의 핌) */}
+      <path d="M9.5 12.5l-1 7" />
+      <path d="M5 16h14" />            {/* 바벨 */}
+      <circle cx="5" cy="16" r="1.3" />
+      <circle cx="19" cy="16" r="1.3" />
     </svg>
   );
 }
 
-function PushIcon({ size = 24, className }: IconProps) {
-  // 팔 굽혔다 펴기(팔 운동)
+function LungeIcon({ size = 24, className }: IconProps) {
+  // 런지 — 앞다리 굽히고 뒷다리 뻗은 측면 실루엣
   return (
     <svg {...base(size, className)}>
-      <circle cx="6.5" cy="6" r="2" />
-      <path d="M6.5 8v5" />
-      <path d="M6.5 10h6l3.5-3.5" />
-      <path d="M12.5 10l4 4" />
+      <circle cx="11" cy="4.5" r="2" />
+      <path d="M11 6.5v5" />
+      <path d="M11 11.5l3 3.5v4.5" />   {/* 앞다리(굽힘) */}
+      <path d="M11 11.5l-4 4 -1.5 4" /> {/* 뒷다리(뻗음) */}
+      <path d="M12 19.5h4" />
     </svg>
   );
 }
 
-function BalanceIcon({ size = 24, className }: IconProps) {
-  // 한 발 균형
+function HipHingeIcon({ size = 24, className }: IconProps) {
+  // 힙힌지 — 무릎 고정, 엉덩이 뒤로 빼고 상체 숙임
   return (
     <svg {...base(size, className)}>
-      <circle cx="12" cy="4.5" r="2" />
-      <path d="M12 6.5v8" />
-      <path d="M12 14.5l-3 5.5" />
-      <path d="M12 11l4-2" />
-      <path d="M5 20h6" />
+      <circle cx="7" cy="6" r="2" />
+      <path d="M7 8l4 4.5" />          {/* 숙인 상체 */}
+      <path d="M11 12.5h3.5" />        {/* 엉덩이 뒤로 */}
+      <path d="M14.5 12.5l-1 7" />     {/* 다리(거의 핌) */}
+      <path d="M14.5 12.5l2 7" />
     </svg>
   );
 }
 
 const EXERCISE_ICONS: Record<ExerciseType, (p: IconProps) => React.JSX.Element> = {
   squat: SquatIcon,
-  calf: CalfIcon,
-  push: PushIcon,
-  balance: BalanceIcon,
+  deadlift: DeadliftIcon,
+  lunge: LungeIcon,
+  hip_hinge: HipHingeIcon,
 };
 
 export function ExerciseIcon({ type, size, className }: IconProps & { type: ExerciseType }) {

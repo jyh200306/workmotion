@@ -47,65 +47,52 @@ const POSES: Record<string, Pose> = {
     label: '스쿼트 자세',
   },
 
-  /** 한발 들기 — 왼발 발뒤꿈치 올리기, 오른발 뒤로 들기 */
-  calf_single: {
-    head: [50, 15],
-    neck:       [[50,24],[50,31]],
-    torso:      [[50,31],[50,77]],
-    armUpperL:  [[37,31],[22,62]], armLowerL: [[22,62],[27,93]],
-    armUpperR:  [[63,31],[78,62]], armLowerR: [[78,62],[73,93]],
-    legUpperL:  [[41,78],[39,118]], legLowerL: [[39,118],[37,155]],
-    legUpperR:  [[59,78],[67,115]], legLowerR: [[67,115],[57,148]],
-    footL: [[30,155],[37,155]], footR: [[50,148],[60,152]],
-    label: '한발 들기',
+  /** 데드리프트 — 무릎 거의 핀 채 상체를 깊게 숙여 바닥의 바벨 잡기 */
+  deadlift: {
+    head: [33, 40],
+    neck:       [[36,46],[42,52]],
+    torso:      [[42,52],[55,86]],            // 상체 깊게 숙임
+    armUpperL:  [[44,55],[44,92]], armLowerL: [[44,92],[44,120]],   // 팔 수직으로 내림
+    armUpperR:  [[50,57],[50,92]], armLowerR: [[50,92],[50,120]],
+    legUpperL:  [[55,88],[52,122]], legLowerL: [[52,122],[50,158]], // 다리 거의 핌
+    legUpperR:  [[60,88],[58,122]], legLowerR: [[58,122],[56,158]],
+    footL: [[44,161],[58,161]], footR: [[46,161],[60,161]],
+    label: '데드리프트 자세',
   },
 
-  /** 팔 준비 — 골포스트 자세 (팔꿈치 어깨 높이, 전완 위로) */
-  push_ready: {
-    head: [50, 15],
-    neck:       [[50,24],[50,31]],
-    torso:      [[50,31],[50,77]],
-    armUpperL:  [[37,31],[11,31]], armLowerL: [[11,31],[11,11]],
-    armUpperR:  [[63,31],[89,31]], armLowerR: [[89,31],[89,11]],
-    legUpperL:  [[41,78],[39,118]], legLowerL: [[39,118],[41,158]],
-    legUpperR:  [[59,78],[61,118]], legLowerR: [[61,118],[59,158]],
-    footL: [[33,161],[49,161]], footR: [[51,161],[67,161]],
-    label: '팔 준비',
+  /** 런지 — 앞다리 굽히고 뒷다리 뒤로 뻗기 */
+  lunge: {
+    head: [50, 28],
+    neck:       [[50,37],[50,44]],
+    torso:      [[50,44],[50,86]],            // 상체 직립
+    armUpperL:  [[40,46],[34,72]], armLowerL: [[34,72],[36,96]],
+    armUpperR:  [[60,46],[66,72]], armLowerR: [[66,72],[64,96]],
+    legUpperL:  [[46,88],[34,118]], legLowerL: [[34,118],[34,156]], // 앞다리(굽힘)
+    legUpperR:  [[54,88],[74,116]], legLowerR: [[74,116],[88,150]], // 뒷다리(뒤로 뻗음)
+    footL: [[28,159],[42,159]], footR: [[82,150],[96,154]],
+    label: '런지 자세',
   },
 
-  /** 팔 펴기 — 양팔 수평으로 완전히 펴기 */
-  push_extend: {
-    head: [50, 15],
-    neck:       [[50,24],[50,31]],
-    torso:      [[50,31],[50,77]],
-    armUpperL:  [[37,31],[20,31]], armLowerL: [[20,31],[3,31]],
-    armUpperR:  [[63,31],[80,31]], armLowerR: [[80,31],[97,31]],
-    legUpperL:  [[41,78],[39,118]], legLowerL: [[39,118],[41,158]],
-    legUpperR:  [[59,78],[61,118]], legLowerR: [[61,118],[59,158]],
-    footL: [[33,161],[49,161]], footR: [[51,161],[67,161]],
-    label: '팔 펴기',
-  },
-
-  /** 한발 균형 — 한발 들고 균형 잡기, 팔 수평 */
-  balance_single: {
-    head: [50, 15],
-    neck:       [[50,24],[50,31]],
-    torso:      [[50,31],[50,77]],
-    armUpperL:  [[37,31],[10,43]], armLowerL: [[10,43],[13,70]],
-    armUpperR:  [[63,31],[90,43]], armLowerR: [[90,43],[87,70]],
-    legUpperL:  [[41,78],[39,118]], legLowerL: [[39,118],[41,158]],
-    legUpperR:  [[59,78],[80,108]], legLowerR: [[80,108],[68,143]],
-    footL: [[33,161],[49,161]], footR: [[60,143],[72,147]],
-    label: '한발 균형',
+  /** 힙힌지 — 무릎 고정, 엉덩이 뒤로 빼고 상체 45~70° 숙임 (데드리프트보다 덜 숙임) */
+  hip_hinge: {
+    head: [36, 30],
+    neck:       [[39,37],[44,43]],
+    torso:      [[44,43],[56,74]],            // 상체 중간 정도 숙임
+    armUpperL:  [[47,47],[47,80]], armLowerL: [[47,80],[47,108]],
+    armUpperR:  [[53,49],[53,80]], armLowerR: [[53,80],[53,108]],
+    legUpperL:  [[56,76],[55,118]], legLowerL: [[55,118],[54,158]], // 다리 핌(무릎 고정)
+    legUpperR:  [[61,76],[61,118]], legLowerR: [[61,118],[60,158]],
+    footL: [[48,161],[62,161]], footR: [[50,161],[64,161]],
+    label: '힙힌지 자세',
   },
 };
 
 // ── 운동 종류 × 단계 → 자세 이름 매핑 ─────────────────
 const POSE_MAP: Record<ExerciseType, Record<ExercisePhase, string>> = {
-  squat:   { ready: 'standing',   active: 'squat',          rest: 'standing'  },
-  calf:    { ready: 'standing',   active: 'calf_single',    rest: 'standing'  },
-  push:    { ready: 'push_ready', active: 'push_extend',    rest: 'push_ready'},
-  balance: { ready: 'standing',   active: 'balance_single', rest: 'standing'  },
+  squat:     { ready: 'standing', active: 'squat',     rest: 'standing' },
+  deadlift:  { ready: 'standing', active: 'deadlift',  rest: 'standing' },
+  lunge:     { ready: 'standing', active: 'lunge',     rest: 'standing' },
+  hip_hinge: { ready: 'standing', active: 'hip_hinge', rest: 'standing' },
 };
 
 // ── 서브 컴포넌트 ──────────────────────────────────────

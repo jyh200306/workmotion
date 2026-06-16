@@ -11,10 +11,10 @@ type Session = {
 };
 
 const EX: Record<string, { label: string }> = {
-  squat:   { label: '스쿼트' },
-  calf:    { label: '종아리' },
-  push:    { label: '팔 운동' },
-  balance: { label: '균형 운동' },
+  squat:     { label: '스쿼트' },
+  deadlift:  { label: '데드리프트' },
+  lunge:     { label: '런지' },
+  hip_hinge: { label: '힙힌지' },
 };
 
 function weekDates28() {

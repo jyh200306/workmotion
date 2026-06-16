@@ -17,20 +17,20 @@ type DashData = {
 };
 
 const EX: Record<string, { label: string }> = {
-  squat:   { label: '스쿼트' },
-  calf:    { label: '종아리' },
-  push:    { label: '팔 운동' },
-  balance: { label: '균형 운동' },
+  squat:     { label: '스쿼트' },
+  deadlift:  { label: '데드리프트' },
+  lunge:     { label: '런지' },
+  hip_hinge: { label: '힙힌지' },
 };
 
 const MOCK: DashData = {
   todaySessions: [
-    { id:'1', user_id:'a', exercise_type:'squat',   sets_completed:3, duration_sec:62, started_at: new Date(Date.now()-600000).toISOString(),  users:{ name:'김영숙', facility_id:'' } },
-    { id:'2', user_id:'b', exercise_type:'balance', sets_completed:2, duration_sec:44, started_at: new Date(Date.now()-1200000).toISOString(), users:{ name:'이철수', facility_id:'' } },
-    { id:'3', user_id:'c', exercise_type:'calf',    sets_completed:3, duration_sec:68, started_at: new Date(Date.now()-2400000).toISOString(), users:{ name:'박순자', facility_id:'' } },
+    { id:'1', user_id:'a', exercise_type:'squat',     sets_completed:3, duration_sec:62, started_at: new Date(Date.now()-600000).toISOString(),  users:{ name:'김영숙', facility_id:'' } },
+    { id:'2', user_id:'b', exercise_type:'hip_hinge', sets_completed:2, duration_sec:44, started_at: new Date(Date.now()-1200000).toISOString(), users:{ name:'이철수', facility_id:'' } },
+    { id:'3', user_id:'c', exercise_type:'deadlift',  sets_completed:3, duration_sec:68, started_at: new Date(Date.now()-2400000).toISOString(), users:{ name:'박순자', facility_id:'' } },
   ],
   todayUsers: 3, todaySets: 8,
-  breakdown: { squat: 8, calf: 6, push: 5, balance: 4 },
+  breakdown: { squat: 8, deadlift: 6, lunge: 5, hip_hinge: 4 },
   users: [
     { id:'a', name:'김영숙', birth_year:1950 },
     { id:'b', name:'이철수', birth_year:1948 },

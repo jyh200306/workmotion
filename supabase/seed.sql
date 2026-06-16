@@ -25,6 +25,6 @@ SELECT
   NOW() - INTERVAL '1 hour' * FLOOR(RANDOM() * 72),
   NOW() - INTERVAL '1 hour' * FLOOR(RANDOM() * 72) + INTERVAL '5 minutes'
 FROM users u
-CROSS JOIN UNNEST(ARRAY['squat','calf','push','balance']::TEXT[]) AS ex
+CROSS JOIN UNNEST(ARRAY['squat','deadlift','lunge','hip_hinge']::TEXT[]) AS ex
 WHERE u.facility_id = '00000000-0000-0000-0000-000000000001'
 LIMIT 24;
