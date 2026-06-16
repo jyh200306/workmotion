@@ -4,6 +4,7 @@ import { use, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CameraFeed } from '@/components/camera/CameraFeed';
 import { SilhouetteOverlay } from '@/components/camera/SilhouetteOverlay';
+import { usePoseCounter } from '@/lib/hooks/usePoseCounter';
 import { speak } from '@/lib/tts';
 import { ExerciseType, ExercisePhase } from '@/types';
 
@@ -39,6 +40,11 @@ const TOTAL_SETS = 3;
 const SET_SEC    = 20;
 const REST_SEC   = 8;
 
+// 한 세트 목표 반복 횟수 — 자세 인식이 동작할 때 이 횟수를 채우면 세트 완료
+const REPS_PER_SET: Record<ExerciseType, number> = {
+  squat: 8, calf: 12, push: 10, balance: 6,
+};
+
 type Stage = 'ready' | 'exercise' | 'rest' | 'done';
 const STAGE_TO_PHASE: Record<Stage, ExercisePhase> = {
   ready: 'ready', exercise: 'active', rest: 'rest', done: 'rest',
@@ -57,7 +63,38 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   const [silOpacity, setSilOpacity] = useState(65);
 
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
+
+  // ── 실시간 자세 인식 ────────────────────────────────────
+  const videoRef    = useRef<HTMLVideoElement>(null);
+  const goalReps    = REPS_PER_SET[exType];
+  const lastSpokeRef = useRef<number>(0);
+
+  const onSetDoneRef = useRef<() => void>(() => {});
+
+  // 목표 반복을 채우면 즉시 세트 완료 처리
+  const handleRep = useCallback((total: number) => {
+    speak(String(total));
+    if (total >= goalReps) onSetDoneRef.current();
+  }, [goalReps]);
+
+  const pose = usePoseCounter({
+    exercise: exType,
+    videoRef,
+    active: stage === 'exercise' && !paused,
+    onRep: handleRep,
+  });
+
+  // 자세 교정 피드백 음성 안내 (4초 쓰로틀)
+  useEffect(() => {
+    if (stage !== 'exercise' || paused) return;
+    if (pose.correctForm) return;
+    const now = Date.now();
+    if (now - lastSpokeRef.current > 4000) {
+      lastSpokeRef.current = now;
+      speak(pose.feedback);
+    }
+  }, [pose.feedback, pose.correctForm, stage, paused]);
 
   const clearTimer = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -77,7 +114,14 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   useEffect(() => () => clearTimer(), []);
 
+  const completingRef = useRef(false); // 세트 완료 중복 처리 가드
+
   const onSetDone = useCallback(() => {
+    // 타이머 만료와 목표 반복 달성이 동시에 발생해도 한 번만 처리
+    if (completingRef.current) return;
+    completingRef.current = true;
+    clearTimer();
+
     setSets(prev => {
       const next = prev + 1;
       if (next >= TOTAL_SETS) {
@@ -89,17 +133,23 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         setStage('rest');
         speak(`${next}세트 완료! ${REST_SEC}초 쉬어가요.`);
         startCountdown(REST_SEC, () => {
+          pose.resetReps();
+          completingRef.current = false;
           setStage('exercise');
           speak('다음 세트 시작합니다');
-          startCountdown(SET_SEC, onSetDone);
+          startCountdown(SET_SEC, onSetDoneRef.current);
         });
       }
       return next;
     });
-  }, [startCountdown, exType]);
+  }, [startCountdown, exType, pose]);
+
+  useEffect(() => { onSetDoneRef.current = onSetDone; }, [onSetDone]);
 
   function handleStart() {
     startTimeRef.current = Date.now();
+    completingRef.current = false;
+    pose.resetReps();
     setStage('exercise');
     speak(`${info.name} 시작합니다`);
     startCountdown(SET_SEC, onSetDone);
@@ -143,7 +193,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
       {/* 카메라 */}
       <div className="flex-1 relative min-h-0">
-        <CameraFeed>
+        <CameraFeed videoRef={videoRef}>
           {stage !== 'done' && (
             <SilhouetteOverlay exerciseType={exType} phase={STAGE_TO_PHASE[stage]} opacity={silOpacity} />
           )}
@@ -156,6 +206,54 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
               stage === 'exercise' ? 'bg-[#0064ff]/80' : 'bg-[#ff6b00]/80'
             }`}>
               {stage === 'exercise' ? '운동 중' : '휴식 중'}
+            </span>
+          </div>
+        )}
+
+        {/* 실시간 반복 카운트 + 진행도 (운동 중, 자세 인식 동작 시) */}
+        {stage === 'exercise' && pose.ready && (
+          <>
+            {/* 반복 횟수 (좌하단) */}
+            <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
+              <div className="bg-black/60 rounded-2xl px-5 py-3 backdrop-blur-sm flex items-baseline gap-1.5">
+                <span className="text-cyan-300 text-5xl font-bold leading-none">{pose.reps}</span>
+                <span className="text-white/60 text-2xl font-semibold">/ {goalReps}회</span>
+              </div>
+            </div>
+
+            {/* 진행도 세로 막대 (우측) */}
+            <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none">
+              <div className="w-3 h-48 bg-black/40 rounded-full overflow-hidden flex flex-col-reverse">
+                <div
+                  className="w-full bg-cyan-300 rounded-full transition-all duration-150"
+                  style={{ height: `${pose.progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* 자세 피드백 (상단, 단계 뱃지 아래) */}
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+              <span className={`px-4 py-1.5 rounded-full text-lg font-semibold backdrop-blur-sm ${
+                pose.correctForm ? 'bg-green-500/70 text-white' : 'bg-[#ff6b00]/80 text-white'
+              }`}>
+                {pose.feedback}
+              </span>
+            </div>
+          </>
+        )}
+
+        {/* 자세 인식 로딩 / 오류 안내 */}
+        {stage === 'exercise' && !pose.ready && !pose.error && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <span className="bg-black/60 text-white/80 text-base px-4 py-1.5 rounded-full backdrop-blur-sm">
+              자세 인식 준비 중…
+            </span>
+          </div>
+        )}
+        {pose.error && stage === 'exercise' && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <span className="bg-black/60 text-white/70 text-sm px-4 py-1.5 rounded-full backdrop-blur-sm">
+              타이머 모드로 진행합니다
             </span>
           </div>
         )}

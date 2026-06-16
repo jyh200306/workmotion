@@ -1,16 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, RefObject } from 'react';
 
 interface CameraFeedProps {
   children?: React.ReactNode;
+  /** 자세 분석용으로 video 요소에 접근하려면 외부 ref 를 전달 (React 19: ref prop) */
+  videoRef?: RefObject<HTMLVideoElement | null>;
 }
 
-export function CameraFeed({ children }: CameraFeedProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export function CameraFeed({ children, videoRef: externalRef }: CameraFeedProps) {
+  const innerRef = useRef<HTMLVideoElement>(null);
+  const videoRef = externalRef ?? innerRef;
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const ref = videoRef;
     let stream: MediaStream | null = null;
 
     async function startCamera() {
@@ -19,8 +23,8 @@ export function CameraFeed({ children }: CameraFeedProps) {
           video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+        if (ref.current) {
+          ref.current.srcObject = stream;
         }
       } catch (err) {
         if (err instanceof DOMException) {
@@ -40,7 +44,7 @@ export function CameraFeed({ children }: CameraFeedProps) {
     return () => {
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, []);
+  }, [videoRef]);
 
   if (error) {
     return (
