@@ -3,17 +3,18 @@
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ExerciseType } from '@/types';
+import { ExerciseIcon, CameraIcon } from '@/components/Icon';
 
 type Step     = { text: string };
 type EGuide = {
-  name: string; emoji: string; dot: string;
+  name: string;
   target: string; benefit: string; duration: string;
   steps: Step[]; cautions: string[];
 };
 
 const GUIDES: Record<ExerciseType, EGuide> = {
   squat: {
-    name: '스쿼트', emoji: '🦵', dot: '#ff6b00',
+    name: '스쿼트',
     target: '허벅지 · 엉덩이 · 종아리', benefit: '하체 근력을 키워 일어서기가 편해져요', duration: '3세트 × 20초',
     steps: [
       { text: '발을 어깨너비로 벌리고 바르게 서세요' },
@@ -25,7 +26,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
     cautions: ['무릎이 발끝 앞으로 너무 나오지 않게 하세요', '허리를 구부리지 마세요', '무릎 통증이 생기면 즉시 중단하세요'],
   },
   calf: {
-    name: '종아리 운동', emoji: '🦶', dot: '#00b900',
+    name: '종아리 운동',
     target: '종아리 근육 (비복근)', benefit: '균형 감각과 혈액 순환이 좋아져요', duration: '3세트 × 20초',
     steps: [
       { text: '의자나 벽 앞에 서서 가볍게 잡아 균형을 잡으세요' },
@@ -37,7 +38,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
     cautions: ['균형을 위해 의자나 벽을 꼭 잡으세요', '발목 통증이 있으면 범위를 줄이세요', '내려올 때 발뒤꿈치를 바닥에 조용히 내려놓으세요'],
   },
   push: {
-    name: '팔 운동', emoji: '💪', dot: '#0064ff',
+    name: '팔 운동',
     target: '어깨 · 팔 · 가슴 근육', benefit: '상체 근력이 강해져 일상 동작이 편해져요', duration: '3세트 × 20초',
     steps: [
       { text: '의자 앞에 서거나 벽을 마주 보고 서세요' },
@@ -49,7 +50,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
     cautions: ['어깨에 무리한 힘이 들어가지 않게 하세요', '손목이 불편하면 주먹을 쥐고 하세요', '어깨 통증이 생기면 즉시 중단하세요'],
   },
   balance: {
-    name: '균형 운동', emoji: '⚖️', dot: '#7c3aed',
+    name: '균형 운동',
     target: '발목 · 종아리 · 코어', benefit: '낙상을 예방하고 중심 잡기가 쉬워져요', duration: '3세트 × 20초',
     steps: [
       { text: '의자나 벽 옆에 서서 가볍게 잡아 균형을 잡으세요' },
@@ -85,8 +86,8 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
           운동 선택
         </button>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ backgroundColor: g.dot + '18' }}>
-            <span className="text-3xl">{g.emoji}</span>
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#ebf3ff] text-[#0064ff]">
+            <ExerciseIcon type={exType} size={28} />
           </div>
           <div>
             <h1 className="text-[26px] font-bold text-[#202632]">{g.name}</h1>
@@ -113,8 +114,8 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
           <div className="flex flex-col gap-5">
             {g.steps.map((s, i) => (
               <div key={i} className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: g.dot + '18' }}>
-                  <span className="text-base font-bold" style={{ color: g.dot }}>{i + 1}</span>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-[#ebf3ff]">
+                  <span className="text-base font-bold text-[#0064ff]">{i + 1}</span>
                 </div>
                 <p className="text-2xl text-[#202632] leading-snug flex-1 pt-0.5">{s.text}</p>
               </div>
@@ -123,12 +124,12 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
         </div>
 
         {/* 주의사항 */}
-        <div className="bg-[#fff9f0] rounded-2xl border border-[#ffe8cc] px-5 py-5">
+        <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
           <p className="text-xl font-bold text-[#202632] mb-4">주의사항</p>
           <div className="flex flex-col gap-3">
             {g.cautions.map((c, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="text-[#ff6b00] text-lg font-bold shrink-0 mt-0.5">!</span>
+                <span className="w-6 h-6 rounded-full bg-[#202632] text-white text-sm font-bold shrink-0 mt-0.5 flex items-center justify-center">!</span>
                 <p className="text-xl text-[#202632] leading-snug">{c}</p>
               </div>
             ))}
@@ -141,8 +142,9 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
         <button
           onClick={() => router.push(`/exercise/${exType}`)}
           className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-2xl font-bold
-                     active:scale-95 transition-transform flex items-center justify-center gap-2"
+                     active:scale-95 transition-transform flex items-center justify-center gap-2.5"
         >
+          <CameraIcon size={24} />
           카메라로 운동 시작
         </button>
         <p className="text-center text-lg text-[#b0b8c1] mt-3">카메라가 자세를 실시간으로 안내해요</p>

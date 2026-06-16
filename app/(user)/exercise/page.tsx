@@ -3,12 +3,13 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ExerciseType } from '@/types';
+import { ExerciseIcon } from '@/components/Icon';
 
 const EXERCISES = [
-  { type: 'squat'   as ExerciseType, emoji: '🦵', name: '스쿼트',    desc: '하체 근력 · 무릎 강화',    dot: '#ff6b00' },
-  { type: 'calf'    as ExerciseType, emoji: '🦶', name: '종아리 운동', desc: '균형 · 혈액 순환 향상',   dot: '#00b900' },
-  { type: 'push'    as ExerciseType, emoji: '💪', name: '팔 운동',    desc: '상체 근력 · 어깨 강화',   dot: '#0064ff' },
-  { type: 'balance' as ExerciseType, emoji: '⚖️', name: '균형 운동',  desc: '낙상 예방 · 코어 강화',   dot: '#7c3aed' },
+  { type: 'squat'   as ExerciseType, name: '스쿼트',    desc: '하체 근력 · 무릎 강화' },
+  { type: 'calf'    as ExerciseType, name: '종아리 운동', desc: '균형 · 혈액 순환 향상' },
+  { type: 'push'    as ExerciseType, name: '팔 운동',    desc: '상체 근력 · 어깨 강화' },
+  { type: 'balance' as ExerciseType, name: '균형 운동',  desc: '낙상 예방 · 코어 강화' },
 ];
 
 const todayStr = new Date().toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'long' });
@@ -104,11 +105,8 @@ export default function ExercisePage() {
             className="w-full bg-white rounded-2xl border border-[#e5e8eb] active:scale-[0.98] transition-transform duration-100 text-left overflow-hidden"
           >
             <div className="flex items-center gap-5 px-5 py-5">
-              <div
-                className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: ex.dot + '18' }}
-              >
-                <span className="text-3xl">{ex.emoji}</span>
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-[#ebf3ff] text-[#0064ff]">
+                <ExerciseIcon type={ex.type} size={28} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-2xl font-bold text-[#202632]">{ex.name}</p>

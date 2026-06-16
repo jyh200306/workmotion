@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { ExerciseType } from '@/types';
+import { ExerciseIcon, RunIcon, BuildingIcon } from '@/components/Icon';
 
 type SessionRow = {
   id: string; user_id: string; exercise_type: string;
@@ -14,11 +16,11 @@ type DashData = {
   breakdown: Record<string, number>; users: UserRow[];
 };
 
-const EX: Record<string, { label: string; emoji: string; dot: string }> = {
-  squat:   { label: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
-  calf:    { label: '종아리',    emoji: '🦶', dot: '#00b900' },
-  push:    { label: '팔 운동',  emoji: '💪', dot: '#0064ff' },
-  balance: { label: '균형 운동', emoji: '⚖️', dot: '#7c3aed' },
+const EX: Record<string, { label: string }> = {
+  squat:   { label: '스쿼트' },
+  calf:    { label: '종아리' },
+  push:    { label: '팔 운동' },
+  balance: { label: '균형 운동' },
 };
 
 const MOCK: DashData = {
@@ -73,12 +75,16 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
       <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-5 border-b border-[#f2f4f6]">
           <h2 className="text-2xl font-bold text-[#202632]">이용자 등록</h2>
-          <button onClick={onClose} className="text-[#6b7684] text-2xl active:opacity-60 w-10 h-10 flex items-center justify-center">✕</button>
+          <button onClick={onClose} aria-label="닫기" className="text-[#6b7684] active:opacity-60 w-10 h-10 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
 
         <div className="px-6 py-6 flex flex-col gap-5">
           <div>
-            <label className="text-lg font-semibold text-[#6b7684] mb-2 block">이름 <span className="text-[#f04452]">*</span></label>
+            <label className="text-lg font-semibold text-[#6b7684] mb-2 block">이름 <span className="text-[#0064ff]">*</span></label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
               className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-2xl font-semibold text-[#202632] py-2 placeholder-[#b0b8c1] focus:outline-none focus:border-[#0064ff] transition-colors" />
           </div>
@@ -90,7 +96,7 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
           </div>
 
           <div>
-            <label className="text-lg font-semibold text-[#6b7684] mb-3 block">PIN 4자리 <span className="text-[#f04452]">*</span></label>
+            <label className="text-lg font-semibold text-[#6b7684] mb-3 block">PIN 4자리 <span className="text-[#0064ff]">*</span></label>
             <div className="flex gap-3 mb-4 justify-center">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className={`w-4 h-4 rounded-full transition-all ${i < pinKeys.length ? 'bg-[#0064ff]' : 'bg-[#e5e8eb]'}`} />
@@ -107,7 +113,7 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
             </div>
           </div>
 
-          {error && <p className="text-lg text-[#f04452] bg-red-50 rounded-xl py-3 text-center">{error}</p>}
+          {error && <p className="text-lg text-[#202632] bg-[#f2f4f6] rounded-xl py-3 text-center">{error}</p>}
 
           <button onClick={submit} disabled={loading}
             className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-xl font-bold active:scale-95 transition-transform disabled:opacity-40">
@@ -127,7 +133,7 @@ function DeleteModal({ user, onClose, onConfirm }: { user: UserRow; onClose: () 
         <p className="text-xl text-[#6b7684] text-center">운동 기록도 함께 삭제됩니다</p>
         <div className="flex gap-3 w-full">
           <button onClick={onClose} className="flex-1 min-h-[56px] rounded-2xl bg-[#f2f4f6] text-xl font-semibold text-[#6b7684] active:scale-95 transition-transform">취소</button>
-          <button onClick={onConfirm} className="flex-1 min-h-[56px] rounded-2xl bg-[#f04452] text-white text-xl font-semibold active:scale-95 transition-transform">삭제</button>
+          <button onClick={onConfirm} className="flex-1 min-h-[56px] rounded-2xl bg-[#202632] text-white text-xl font-semibold active:scale-95 transition-transform">삭제</button>
         </div>
       </div>
     </div>
@@ -198,8 +204,8 @@ export default function DashboardPage() {
               <h1 className="text-[26px] font-bold text-white">관리자</h1>
               <p className="text-[#6b7684] text-xl mt-0.5">{facilityName || '행복노인복지관'}</p>
             </div>
-            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-              <span className="text-2xl">🏢</span>
+            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-white">
+              <BuildingIcon size={24} />
             </div>
           </div>
         </div>
@@ -242,10 +248,10 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-4">
                   {breakdown.map(ex => (
                     <div key={ex.key} className="flex items-center gap-3">
-                      <span className="text-xl w-7">{ex.emoji}</span>
+                      <span className="w-7 text-[#0064ff] shrink-0"><ExerciseIcon type={ex.key as ExerciseType} size={22} /></span>
                       <span className="text-xl text-[#6b7684] w-20 shrink-0">{ex.label}</span>
                       <div className="flex-1 h-2 bg-[#f2f4f6] rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(ex.count / maxCount) * 100}%`, backgroundColor: ex.dot }} />
+                        <div className="h-full rounded-full bg-[#0064ff] transition-all duration-500" style={{ width: `${(ex.count / maxCount) * 100}%` }} />
                       </div>
                       <span className="text-lg font-bold text-[#202632] w-6 text-right">{ex.count}</span>
                     </div>
@@ -260,10 +266,13 @@ export default function DashboardPage() {
                 ) : (
                   <div className="flex flex-col divide-y divide-[#f2f4f6]">
                     {data.todaySessions.slice(0, 10).map(s => {
-                      const meta = EX[s.exercise_type] ?? { emoji:'🏃', label: s.exercise_type, dot: '#6b7684' };
+                      const meta = EX[s.exercise_type] ?? { label: s.exercise_type };
+                      const known = !!EX[s.exercise_type];
                       return (
                         <div key={s.id} className="flex items-center gap-4 py-3.5">
-                          <span className="text-2xl">{meta.emoji}</span>
+                          <span className="w-9 h-9 rounded-lg bg-[#ebf3ff] text-[#0064ff] flex items-center justify-center shrink-0">
+                            {known ? <ExerciseIcon type={s.exercise_type as ExerciseType} size={20} /> : <RunIcon size={20} />}
+                          </span>
                           <div className="flex-1">
                             <p className="text-2xl font-semibold text-[#202632]">{s.users?.name ?? '이용자'}</p>
                             <p className="text-lg text-[#6b7684]">{meta.label} · {s.sets_completed}세트</p>
@@ -318,10 +327,10 @@ export default function DashboardPage() {
                             <p className="text-lg text-[#b0b8c1] mt-0.5">{age ? `${age}세` : '나이 미입력'}</p>
                           </button>
                           <div className="flex flex-col items-end gap-2 shrink-0">
-                            <span className={`text-sm px-2.5 py-1 rounded-full font-semibold ${exercisedToday ? 'bg-[#e8fae8] text-[#00b900]' : 'bg-[#f2f4f6] text-[#b0b8c1]'}`}>
+                            <span className={`text-sm px-2.5 py-1 rounded-full font-semibold ${exercisedToday ? 'bg-[#ebf3ff] text-[#0064ff]' : 'bg-[#f2f4f6] text-[#b0b8c1]'}`}>
                               {exercisedToday ? '완료' : '미운동'}
                             </span>
-                            <button onClick={() => setDeleteTarget(u)} className="text-lg text-[#f04452] active:opacity-60 px-1">삭제</button>
+                            <button onClick={() => setDeleteTarget(u)} className="text-lg text-[#6b7684] active:opacity-60 px-1">삭제</button>
                           </div>
                         </div>
                       );

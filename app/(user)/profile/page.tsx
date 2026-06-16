@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { ExerciseType } from '@/types';
+import { ExerciseIcon, FlameIcon, RunIcon, StackIcon } from '@/components/Icon';
 
 type UserData = { id: string; name: string; birth_year?: number };
 type SessionRow = { exercise_type: string; sets_completed: number; started_at: string };
 
-const EX: Record<string, { name: string; emoji: string; dot: string }> = {
-  squat:   { name: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
-  calf:    { name: '종아리 운동', emoji: '🦶', dot: '#00b900' },
-  push:    { name: '팔 운동',   emoji: '💪', dot: '#0064ff' },
-  balance: { name: '균형 운동',  emoji: '⚖️', dot: '#7c3aed' },
+const EX: Record<string, { name: string }> = {
+  squat:   { name: '스쿼트' },
+  calf:    { name: '종아리 운동' },
+  push:    { name: '팔 운동' },
+  balance: { name: '균형 운동' },
 };
 
 const GOAL_LABELS: Record<string, string> = {
@@ -107,12 +109,12 @@ export default function ProfilePage() {
         {/* 스탯 */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label:'연속 운동', value:`${streak}일`,           icon:'🔥' },
-            { label:'총 운동',  value:`${sessions.length}회`,  icon:'🏃' },
-            { label:'총 세트',  value:`${totalSets}세트`,      icon:'💪' },
+            { label:'연속 운동', value:`${streak}일`,          Icon: FlameIcon },
+            { label:'총 운동',  value:`${sessions.length}회`, Icon: RunIcon },
+            { label:'총 세트',  value:`${totalSets}세트`,     Icon: StackIcon },
           ].map(c => (
             <div key={c.label} className="bg-white rounded-2xl border border-[#e5e8eb] p-4 text-center">
-              <p className="text-2xl mb-1">{c.icon}</p>
+              <c.Icon size={24} className="mx-auto mb-1.5 text-[#0064ff]" />
               <p className="text-2xl font-bold text-[#202632]">{c.value}</p>
               <p className="text-sm text-[#b0b8c1] mt-0.5">{c.label}</p>
             </div>
@@ -148,8 +150,8 @@ export default function ProfilePage() {
         {/* 선호 운동 */}
         {favEx && EX[favEx] && (
           <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: EX[favEx].dot + '18' }}>
-              <span className="text-2xl">{EX[favEx].emoji}</span>
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[#ebf3ff] text-[#0064ff]">
+              <ExerciseIcon type={favEx as ExerciseType} size={26} />
             </div>
             <div>
               <p className="text-lg text-[#6b7684]">가장 많이 한 운동</p>
@@ -168,10 +170,13 @@ export default function ProfilePage() {
               </button>
             </div>
             {sessions.slice(0, 3).map((s, idx) => {
-              const ex = EX[s.exercise_type] ?? { emoji:'🏃', name: s.exercise_type, dot: '#6b7684' };
+              const ex = EX[s.exercise_type] ?? { name: s.exercise_type };
+              const known = !!EX[s.exercise_type];
               return (
                 <div key={s.started_at + idx} className={`flex items-center gap-4 px-5 py-4 ${idx !== Math.min(sessions.length, 3) - 1 ? 'border-b border-[#f2f4f6]' : ''}`}>
-                  <span className="text-2xl">{ex.emoji}</span>
+                  <span className="w-9 h-9 rounded-lg bg-[#ebf3ff] text-[#0064ff] flex items-center justify-center shrink-0">
+                    {known ? <ExerciseIcon type={s.exercise_type as ExerciseType} size={20} /> : <RunIcon size={20} />}
+                  </span>
                   <div className="flex-1">
                     <p className="text-2xl font-semibold text-[#202632]">{ex.name}</p>
                     <p className="text-lg text-[#6b7684]">{s.sets_completed}세트</p>

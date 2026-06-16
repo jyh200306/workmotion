@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { StackIcon, PoseIcon, RunIcon, CameraIcon, BellIcon } from '@/components/Icon';
 
 const GOALS = [
-  { id: 'strength', label: '근력 강화',  desc: '다리·팔 근육을 키우고 싶어요', icon: '💪' },
-  { id: 'balance',  label: '균형 향상',  desc: '균형 잡기가 어렵거나 낙상이 걱정돼요', icon: '⚖️' },
-  { id: 'health',   label: '건강 유지',  desc: '꾸준하게 몸을 움직이고 싶어요', icon: '🏃' },
+  { id: 'strength', label: '근력 강화',  desc: '다리·팔 근육을 키우고 싶어요', Icon: StackIcon },
+  { id: 'balance',  label: '균형 향상',  desc: '균형 잡기가 어렵거나 낙상이 걱정돼요', Icon: PoseIcon },
+  { id: 'health',   label: '건강 유지',  desc: '꾸준하게 몸을 움직이고 싶어요', Icon: RunIcon },
 ];
 
 export default function OnboardingPage() {
@@ -79,7 +80,7 @@ export default function OnboardingPage() {
                            text-[#202632] py-3 placeholder-[#b0b8c1] focus:outline-none
                            focus:border-[#0064ff] transition-colors"
               />
-              {nameError && <p className="text-lg text-[#f04452] mt-1">{nameError}</p>}
+              {nameError && <p className="text-lg text-[#202632] font-semibold mt-1">{nameError}</p>}
             </div>
           </>
         )}
@@ -104,7 +105,9 @@ export default function OnboardingPage() {
                       : 'border-[#e5e8eb] bg-white'
                     }`}
                 >
-                  <span className="text-4xl shrink-0">{g.icon}</span>
+                  <span className={`shrink-0 ${goal === g.id ? 'text-[#0064ff]' : 'text-[#b0b8c1]'}`}>
+                    <g.Icon size={36} />
+                  </span>
                   <div className="flex-1 min-w-0">
                     <p className={`text-2xl font-bold ${goal === g.id ? 'text-[#0064ff]' : 'text-[#202632]'}`}>
                       {g.label}
@@ -137,12 +140,12 @@ export default function OnboardingPage() {
             </div>
             <div className="w-full bg-[#f2f4f6] rounded-2xl p-5 text-left flex flex-col gap-4">
               {[
-                { icon: '📷', text: '카메라로 내 동작을 확인해요' },
-                { icon: '🧍', text: '파란 가이드 라인에 맞춰 운동해요' },
-                { icon: '🔔', text: '세트 완료 안내음이 울려요' },
+                { Icon: CameraIcon, text: '카메라로 내 동작을 확인해요' },
+                { Icon: PoseIcon,   text: '파란 가이드 라인에 맞춰 운동해요' },
+                { Icon: BellIcon,   text: '세트 완료 안내음이 울려요' },
               ].map(t => (
                 <div key={t.text} className="flex items-center gap-3">
-                  <span className="text-2xl">{t.icon}</span>
+                  <span className="text-[#0064ff] shrink-0"><t.Icon size={24} /></span>
                   <p className="text-xl text-[#202632]">{t.text}</p>
                 </div>
               ))}

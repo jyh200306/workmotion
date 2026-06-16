@@ -113,7 +113,7 @@ function Seg({ a, b, w }: { a: P; b: P; w: number }) {
   return <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} strokeWidth={w} />;
 }
 function Dot({ p }: { p: P }) {
-  return <circle cx={p[0]} cy={p[1]} r={2.8} fill="#67E8F9" stroke="none" />;
+  return <circle cx={p[0]} cy={p[1]} r={2.8} fill="#4d94ff" stroke="none" />;
 }
 
 // ── 메인 컴포넌트 ─────────────────────────────────────
@@ -157,7 +157,7 @@ export function SilhouetteOverlay({
         {/* ── 점선 스켈레톤 ── */}
         <g
           filter="url(#sg)"
-          stroke="#67E8F9"
+          stroke="#4d94ff"
           strokeDasharray="7 4"
           strokeLinecap="round"
           fill="none"
@@ -165,7 +165,7 @@ export function SilhouetteOverlay({
           {/* 머리 */}
           <circle
             cx={pose.head[0]} cy={pose.head[1]} r={9}
-            fill="rgba(103,232,249,0.08)"
+            fill="rgba(77,148,255,0.08)"
             strokeWidth={2.5}
           />
           {/* 목 */}
@@ -204,7 +204,7 @@ export function SilhouetteOverlay({
 
       {/* 자세 레이블 */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
-        <span className="bg-black/50 text-cyan-300 text-xl font-bold px-4 py-1.5 rounded-full backdrop-blur-sm">
+        <span className="bg-black/50 text-[#4d94ff] text-xl font-bold px-4 py-1.5 rounded-full backdrop-blur-sm">
           {pose.label}
         </span>
       </div>

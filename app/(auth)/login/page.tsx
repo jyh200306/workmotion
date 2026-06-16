@@ -85,7 +85,7 @@ export default function LoginPage() {
 
       {/* 에러 */}
       <div className="h-9 flex items-center justify-center px-8">
-        {error   && <p className="text-lg text-[#f04452] font-medium">{error}</p>}
+        {error   && <p className="text-lg text-[#202632] font-semibold">{error}</p>}
         {loading && <p className="text-lg text-[#b0b8c1]">확인 중</p>}
       </div>
 

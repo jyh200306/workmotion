@@ -2,17 +2,19 @@
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ExerciseType } from '@/types';
+import { ExerciseIcon, RunIcon } from '@/components/Icon';
 
 type Session = {
   id: string; exercise_type: string;
   sets_completed: number; duration_sec: number; started_at: string;
 };
 
-const EX: Record<string, { label: string; emoji: string; dot: string }> = {
-  squat:   { label: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
-  calf:    { label: '종아리',    emoji: '🦶', dot: '#00b900' },
-  push:    { label: '팔 운동',  emoji: '💪', dot: '#0064ff' },
-  balance: { label: '균형 운동', emoji: '⚖️', dot: '#7c3aed' },
+const EX: Record<string, { label: string }> = {
+  squat:   { label: '스쿼트' },
+  calf:    { label: '종아리' },
+  push:    { label: '팔 운동' },
+  balance: { label: '균형 운동' },
 };
 
 function weekDates28() {
@@ -135,13 +137,14 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
             <p className="text-xl font-bold text-[#202632] mb-4">종목별 현황</p>
             <div className="flex flex-col gap-4">
               {Object.entries(breakdown).sort((a,b) => b[1]-a[1]).map(([key, cnt]) => {
-                const meta = EX[key] ?? { emoji:'🏃', label: key, dot: '#6b7684' };
+                const meta = EX[key] ?? { label: key };
+                const known = !!EX[key];
                 return (
                   <div key={key} className="flex items-center gap-3">
-                    <span className="text-xl w-7">{meta.emoji}</span>
+                    <span className="w-7 text-[#0064ff] shrink-0">{known ? <ExerciseIcon type={key as ExerciseType} size={22} /> : <RunIcon size={22} />}</span>
                     <span className="text-xl text-[#6b7684] w-20 shrink-0">{meta.label}</span>
                     <div className="flex-1 h-2 bg-[#f2f4f6] rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all duration-500" style={{ width:`${(cnt/maxCount)*100}%`, backgroundColor: meta.dot }} />
+                      <div className="h-full rounded-full bg-[#0064ff] transition-all duration-500" style={{ width:`${(cnt/maxCount)*100}%` }} />
                     </div>
                     <span className="text-lg font-bold text-[#202632] w-6 text-right">{cnt}</span>
                   </div>
@@ -161,10 +164,13 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
           ) : (
             <div className="flex flex-col divide-y divide-[#f2f4f6]">
               {sessions.slice(0, 20).map(s => {
-                const meta = EX[s.exercise_type] ?? { emoji:'🏃', label: s.exercise_type, dot: '#6b7684' };
+                const meta = EX[s.exercise_type] ?? { label: s.exercise_type };
+                const known = !!EX[s.exercise_type];
                 return (
                   <div key={s.id} className="flex items-center gap-4 px-5 py-4">
-                    <span className="text-2xl">{meta.emoji}</span>
+                    <span className="w-9 h-9 rounded-lg bg-[#ebf3ff] text-[#0064ff] flex items-center justify-center shrink-0">
+                      {known ? <ExerciseIcon type={s.exercise_type as ExerciseType} size={20} /> : <RunIcon size={20} />}
+                    </span>
                     <div className="flex-1">
                       <p className="text-2xl font-semibold text-[#202632]">{meta.label}</p>
                       <p className="text-lg text-[#6b7684]">{s.sets_completed}세트 · {fmt(s.duration_sec)}</p>

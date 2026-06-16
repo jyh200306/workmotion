@@ -9,9 +9,10 @@
   --color-ink-muted:   #b0b8c1;
   --color-surface:     #f2f4f6;
   --color-border:      #e5e8eb;
-  --color-success:     #00b900;
-  --color-error:       #f04452;
-  --color-warn:        #ff6600;
+  /* 화이트·블루·그레이·블랙 팔레트로 통일 (의미색 → 단색 체계) */
+  --color-success:     #0064ff;  /* 완료/긍정 → 브랜드 블루 */
+  --color-error:       #202632;  /* 경고/삭제 → 잉크(블랙) */
+  --color-warn:        #6b7684;   /* 주의 → 그레이 */
 }
 
 * {

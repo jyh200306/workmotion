@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ExerciseType } from '@/types';
+import { ExerciseIcon, RunIcon } from '@/components/Icon';
 
 type SessionRow = {
   id: string;
@@ -11,11 +13,11 @@ type SessionRow = {
   started_at: string;
 };
 
-const EX: Record<string, { name: string; emoji: string; dot: string }> = {
-  squat:   { name: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
-  calf:    { name: '종아리 운동', emoji: '🦶', dot: '#00b900' },
-  push:    { name: '팔 운동',   emoji: '💪', dot: '#0064ff' },
-  balance: { name: '균형 운동',  emoji: '⚖️', dot: '#7c3aed' },
+const EX: Record<string, { name: string }> = {
+  squat:   { name: '스쿼트' },
+  calf:    { name: '종아리 운동' },
+  push:    { name: '팔 운동' },
+  balance: { name: '균형 운동' },
 };
 
 const MOCK: SessionRow[] = [
@@ -105,8 +107,8 @@ export default function HistoryPage() {
           <p className="text-center text-xl text-[#b0b8c1] mt-10 animate-pulse">불러오는 중</p>
         ) : groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center mt-16 gap-4">
-            <div className="w-20 h-20 bg-[#f2f4f6] rounded-full flex items-center justify-center">
-              <span className="text-4xl">🏃</span>
+            <div className="w-20 h-20 bg-[#ebf3ff] rounded-full flex items-center justify-center text-[#0064ff]">
+              <RunIcon size={36} />
             </div>
             <p className="text-2xl text-[#6b7684]">아직 운동 기록이 없어요</p>
           </div>
@@ -118,14 +120,14 @@ export default function HistoryPage() {
                 const ex = EX[s.exercise_type];
                 return (
                   <div key={s.id} className={`flex items-center gap-4 px-5 py-4 ${idx !== items.length - 1 ? 'border-b border-[#f2f4f6]' : ''}`}>
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: ex.dot + '18' }}>
-                      <span className="text-2xl">{ex.emoji}</span>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#ebf3ff] text-[#0064ff]">
+                      <ExerciseIcon type={s.exercise_type as ExerciseType} size={24} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-2xl font-semibold text-[#202632]">{ex.name}</p>
                       <p className="text-lg text-[#6b7684] mt-0.5">{s.sets_completed}세트 · {fmt(s.duration_sec)}</p>
                     </div>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#00b900] shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#0064ff] shrink-0">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>

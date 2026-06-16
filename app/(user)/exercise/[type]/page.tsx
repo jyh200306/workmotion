@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CameraFeed } from '@/components/camera/CameraFeed';
 import { SilhouetteOverlay } from '@/components/camera/SilhouetteOverlay';
 import { usePoseCounter } from '@/lib/hooks/usePoseCounter';
+import { ExerciseIcon } from '@/components/Icon';
 import { speak } from '@/lib/tts';
 import { ExerciseType, ExercisePhase } from '@/types';
 
@@ -21,11 +22,11 @@ async function saveSessionToDb(exType: string, sets: number, durationSec: number
   } catch { /**/ }
 }
 
-const EX_INFO: Record<ExerciseType, { name: string; emoji: string; dot: string }> = {
-  squat:   { name: '스쿼트',    emoji: '🦵', dot: '#ff6b00' },
-  calf:    { name: '종아리 운동', emoji: '🦶', dot: '#00b900' },
-  push:    { name: '팔 운동',   emoji: '💪', dot: '#0064ff' },
-  balance: { name: '균형 운동',  emoji: '⚖️', dot: '#7c3aed' },
+const EX_INFO: Record<ExerciseType, { name: string }> = {
+  squat:   { name: '스쿼트' },
+  calf:    { name: '종아리 운동' },
+  push:    { name: '팔 운동' },
+  balance: { name: '균형 운동' },
 };
 
 const TIPS: Record<ExerciseType, string> = {
@@ -182,8 +183,8 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         <button onClick={() => router.push('/exercise')} className="text-white/60 text-xl active:opacity-50 transition-opacity px-1">
           나가기
         </button>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{info.emoji}</span>
+        <div className="flex items-center gap-2 text-white">
+          <ExerciseIcon type={exType} size={22} />
           <span className="text-white text-xl font-semibold">{info.name}</span>
         </div>
         <div className="bg-white/10 px-4 py-2 rounded-xl min-w-[68px] text-center">
@@ -203,7 +204,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         {stage !== 'ready' && stage !== 'done' && (
           <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
             <span className={`px-5 py-2 rounded-full text-lg font-semibold text-white backdrop-blur-sm ${
-              stage === 'exercise' ? 'bg-[#0064ff]/80' : 'bg-[#ff6b00]/80'
+              stage === 'exercise' ? 'bg-[#0064ff]/80' : 'bg-[#6b7684]/80'
             }`}>
               {stage === 'exercise' ? '운동 중' : '휴식 중'}
             </span>
@@ -216,7 +217,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
             {/* 반복 횟수 (좌하단) */}
             <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
               <div className="bg-black/60 rounded-2xl px-5 py-3 backdrop-blur-sm flex items-baseline gap-1.5">
-                <span className="text-cyan-300 text-5xl font-bold leading-none">{pose.reps}</span>
+                <span className="text-[#4d94ff] text-5xl font-bold leading-none">{pose.reps}</span>
                 <span className="text-white/60 text-2xl font-semibold">/ {goalReps}회</span>
               </div>
             </div>
@@ -225,7 +226,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
             <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none">
               <div className="w-3 h-48 bg-black/40 rounded-full overflow-hidden flex flex-col-reverse">
                 <div
-                  className="w-full bg-cyan-300 rounded-full transition-all duration-150"
+                  className="w-full bg-[#4d94ff] rounded-full transition-all duration-150"
                   style={{ height: `${pose.progress}%` }}
                 />
               </div>
@@ -234,7 +235,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
             {/* 자세 피드백 (상단, 단계 뱃지 아래) */}
             <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
               <span className={`px-4 py-1.5 rounded-full text-lg font-semibold backdrop-blur-sm ${
-                pose.correctForm ? 'bg-green-500/70 text-white' : 'bg-[#ff6b00]/80 text-white'
+                pose.correctForm ? 'bg-[#0064ff]/80 text-white' : 'bg-[#6b7684]/85 text-white'
               }`}>
                 {pose.feedback}
               </span>
@@ -300,7 +301,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
               <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="52" fill="none" stroke="#2a2a2a" strokeWidth="8"/>
                 <circle cx="60" cy="60" r="52" fill="none"
-                  stroke={stage === 'rest' ? '#ff6b00' : '#0064ff'}
+                  stroke={stage === 'rest' ? '#6b7684' : '#0064ff'}
                   strokeWidth="8"
                   strokeDasharray={circum}
                   strokeDashoffset={circum * (1 - progress / 100)}
