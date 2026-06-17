@@ -36,12 +36,13 @@ export interface PoseCounterState {
 interface Options {
   exercise: ExerciseType;
   videoRef: RefObject<HTMLVideoElement | null>;
-  active: boolean;       // 운동 중일 때만 분석
+  active: boolean;       // true 면 분석 루프 실행(스켈레톤 좌표 생성). 비운동 단계에도 켤 수 있음
+  counting: boolean;     // true 일 때만 반복 횟수를 증가시킴 (운동 중에만 카운트)
   isSenior?: boolean;    // 60세 이상 → 완화 임계값 적용 (mvp.md)
   onRep?: (total: number) => void;
 }
 
-export function usePoseCounter({ exercise, videoRef, active, isSenior = false, onRep }: Options) {
+export function usePoseCounter({ exercise, videoRef, active, counting, isSenior = false, onRep }: Options) {
   const [state, setState] = useState<PoseCounterState>({
     ready: false, reps: 0, progress: 0,
     feedback: '준비하세요', correctForm: false, error: null,
@@ -55,12 +56,14 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
   const lastVideoTimeRef = useRef(-1);
   const repsRef = useRef(0);
 
-  // 콜백/운동종류/시니어를 ref 로 안정화 — 루프가 항상 최신 값을 보되 재구독 없이 동작
+  // 콜백/운동종류/시니어/카운트허용을 ref 로 안정화 — 루프가 항상 최신 값을 보되 재구독 없이 동작
   const onRepRef = useRef(onRep);
   const exerciseRef = useRef(exercise);
   const seniorRef = useRef(isSenior);
+  const countingRef = useRef(counting);
   useEffect(() => { onRepRef.current = onRep; }, [onRep]);
   useEffect(() => { exerciseRef.current = exercise; }, [exercise]);
+  useEffect(() => { countingRef.current = counting; }, [counting]);
   useEffect(() => { seniorRef.current = isSenior; }, [isSenior]);
 
   // ── 모델 1회 로드 ──────────────────────────────────────
@@ -121,7 +124,8 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
             // 각도 판정은 원본 lms 를 그대로 사용 (스무딩 영향 없음)
             const a = analyzePose(exerciseRef.current, lms, seniorRef.current);
             const completed = counterRef.current.update(a.endpoint, a.progress);
-            if (completed) {
+            // 카운트는 counting=true(운동 중)일 때만. ready/rest 에선 스켈레톤만 그리고 카운트 안 함
+            if (completed && countingRef.current) {
               repsRef.current += 1;
               onRepRef.current?.(repsRef.current);
             }

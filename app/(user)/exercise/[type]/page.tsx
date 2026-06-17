@@ -3,12 +3,11 @@
 import { use, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CameraFeed } from '@/components/camera/CameraFeed';
-import { SilhouetteOverlay } from '@/components/camera/SilhouetteOverlay';
 import { PoseSkeletonOverlay } from '@/components/camera/PoseSkeletonOverlay';
 import { usePoseCounter } from '@/lib/hooks/usePoseCounter';
 import { ExerciseIcon } from '@/components/Icon';
 import { speak } from '@/lib/tts';
-import { ExerciseType, ExercisePhase } from '@/types';
+import { ExerciseType } from '@/types';
 
 async function saveSessionToDb(exType: string, sets: number, durationSec: number) {
   try {
@@ -48,9 +47,6 @@ const REPS_PER_SET: Record<ExerciseType, number> = {
 };
 
 type Stage = 'ready' | 'exercise' | 'rest' | 'done';
-const STAGE_TO_PHASE: Record<Stage, ExercisePhase> = {
-  ready: 'ready', exercise: 'active', rest: 'rest', done: 'rest',
-};
 
 export default function ExerciseSessionPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = use(params);
@@ -62,7 +58,6 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   const [sets,       setSets]       = useState(0);
   const [timeLeft,   setTimeLeft]   = useState(SET_SEC);
   const [paused,     setPaused]     = useState(false);
-  const [silOpacity, setSilOpacity] = useState(65);
   const [isSenior,   setIsSenior]   = useState(false); // 60세 이상 → 완화 임계값 (mvp.md)
 
   // 이용자 출생년도로 시니어 여부 판정
@@ -92,7 +87,10 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   const pose = usePoseCounter({
     exercise: exType,
     videoRef,
-    active: stage === 'exercise' && !paused,
+    // 분석 루프(스켈레톤 좌표 생성)는 done 을 제외한 모든 단계에서 실행 → ready/rest 에도 스켈레톤 표시
+    active: stage !== 'done' && !paused,
+    // 반복 카운트는 운동 중에만 → 시작 전·휴식 중 동작은 세지 않음
+    counting: stage === 'exercise' && !paused,
     isSenior,
     onRep: handleRep,
   });
@@ -206,11 +204,8 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
       {/* 카메라 */}
       <div className="flex-1 relative min-h-0">
         <CameraFeed videoRef={videoRef}>
+          {/* 실시간 사용자 스켈레톤 — 완료 단계 제외 모든 단계에서 표시(유일한 가이드) */}
           {stage !== 'done' && (
-            <SilhouetteOverlay exerciseType={exType} phase={STAGE_TO_PHASE[stage]} opacity={silOpacity} />
-          )}
-          {/* 실시간 사용자 스켈레톤 (운동 중에만, 가이드와 함께 표시) */}
-          {stage === 'exercise' && (
             <PoseSkeletonOverlay landmarks={pose.landmarks} videoRef={videoRef} correctForm={pose.correctForm} />
           )}
         </CameraFeed>
@@ -349,17 +344,6 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
             className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform">
             완료하기
           </button>
-        )}
-
-        {/* 실루엣 투명도 */}
-        {stage !== 'done' && (
-          <div className="flex items-center gap-3 pt-1">
-            <span className="text-white/40 text-sm">가이드</span>
-            <input type="range" min={0} max={100} value={silOpacity}
-              onChange={e => setSilOpacity(Number(e.target.value))}
-              className="flex-1 h-1.5 accent-[#0064ff] cursor-pointer" />
-            <span className="text-white/40 text-sm w-9 text-right tabular-nums">{silOpacity}%</span>
-          </div>
         )}
       </div>
     </div>
