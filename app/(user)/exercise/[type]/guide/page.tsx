@@ -15,7 +15,7 @@ type EGuide = {
 const GUIDES: Record<ExerciseType, EGuide> = {
   squat: {
     name: '스쿼트',
-    target: '허벅지 · 엉덩이 · 종아리', benefit: '하체 근력을 키워 일어서기가 편해져요', duration: '3세트 × 20초',
+    target: '허벅지 · 엉덩이 · 종아리', benefit: '하체 근력과 둔근, 대퇴사두근을 강화해 기능적 움직임의 기초를 만듭니다', duration: '3세트 × 20초',
     steps: [
       { text: '발을 어깨너비로 벌리고 바르게 서세요' },
       { text: '양손은 앞으로 나란히 또는 허리에 올려주세요' },
@@ -27,7 +27,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
   },
   deadlift: {
     name: '데드리프트',
-    target: '엉덩이 · 등 후면 · 햄스트링', benefit: '몸 뒷면 근육을 강화해 자세가 곧아져요', duration: '3세트 × 20초',
+    target: '엉덩이 · 등 후면 · 햄스트링', benefit: '후면 사슬(햄스트링, 둔근, 척추기립근)을 강화해 들기 동작의 안정성을 높입니다', duration: '3세트 × 20초',
     steps: [
       { text: '발을 어깨너비로 벌리고 바르게 서세요' },
       { text: '무릎을 살짝만 굽힌 채 고정해요' },
@@ -39,7 +39,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
   },
   lunge: {
     name: '런지',
-    target: '허벅지 · 엉덩이 · 균형 근육', benefit: '다리 좌우 균형과 하체 안정성이 좋아져요', duration: '3세트 × 20초',
+    target: '허벅지 · 엉덩이 · 균형 근육', benefit: '단측 하지 근력과 동적 균형 능력을 동시에 발달시킵니다', duration: '3세트 × 20초',
     steps: [
       { text: '바르게 선 뒤 한 발을 앞으로 크게 내딛어요' },
       { text: '필요하면 의자나 벽을 옆에 두고 균형을 잡으세요' },
@@ -51,7 +51,7 @@ const GUIDES: Record<ExerciseType, EGuide> = {
   },
   hip_hinge: {
     name: '힙힌지',
-    target: '엉덩이 · 햄스트링', benefit: '엉덩이를 활성화해 허리 부담을 줄여줘요', duration: '3세트 × 20초',
+    target: '엉덩이 · 햄스트링', benefit: '고관절 굴곡-신전 패턴을 학습시켜 척추 부담을 줄이는 움직임 기전을 형성합니다', duration: '3세트 × 20초',
     steps: [
       { text: '발을 어깨너비로 벌리고 바르게 서세요' },
       { text: '무릎을 거의 편 상태로 고정해요' },
