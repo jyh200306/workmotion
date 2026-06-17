@@ -4,6 +4,7 @@ import { use, useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CameraFeed } from '@/components/camera/CameraFeed';
 import { SilhouetteOverlay } from '@/components/camera/SilhouetteOverlay';
+import { PoseSkeletonOverlay } from '@/components/camera/PoseSkeletonOverlay';
 import { usePoseCounter } from '@/lib/hooks/usePoseCounter';
 import { ExerciseIcon } from '@/components/Icon';
 import { speak } from '@/lib/tts';
@@ -207,6 +208,10 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         <CameraFeed videoRef={videoRef}>
           {stage !== 'done' && (
             <SilhouetteOverlay exerciseType={exType} phase={STAGE_TO_PHASE[stage]} opacity={silOpacity} />
+          )}
+          {/* 실시간 사용자 스켈레톤 (운동 중에만, 가이드와 함께 표시) */}
+          {stage === 'exercise' && (
+            <PoseSkeletonOverlay landmarks={pose.landmarks} correctForm={pose.correctForm} />
           )}
         </CameraFeed>
 

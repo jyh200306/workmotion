@@ -29,6 +29,8 @@ export interface PoseCounterState {
   feedback: string;      // 자세 피드백 문구
   correctForm: boolean;  // 자세 정확 여부
   error: string | null;
+  /** 화면에 "그리기용"으로 내보내는 원본 관절 좌표(각도 판정과 무관). 없으면 null. */
+  landmarks: Landmark[] | null;
 }
 
 interface Options {
@@ -43,6 +45,7 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
   const [state, setState] = useState<PoseCounterState>({
     ready: false, reps: 0, progress: 0,
     feedback: '준비하세요', correctForm: false, error: null,
+    landmarks: null,
   });
 
   // mutable refs — 렌더 사이클과 무관하게 루프에서 사용
@@ -110,11 +113,12 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
           const lms: Landmark[] | undefined = result?.landmarks?.[0];
 
           if (!lms || lms.length === 0) {
-            setState(s => ({ ...s, feedback: '화면 안에 들어와 주세요', correctForm: false }));
+            setState(s => ({ ...s, feedback: '화면 안에 들어와 주세요', correctForm: false, landmarks: null }));
           } else if (!isFrameVisible(lms)) {
             // 주요 랜드마크가 가려짐 → 운동 일시정지, 카운트 안 함 (mvp.md FRAME_WARNING)
-            setState(s => ({ ...s, feedback: '뒤로 물러나세요 — 전신이 카메라에 들어와야 합니다', correctForm: false }));
+            setState(s => ({ ...s, feedback: '뒤로 물러나세요 — 전신이 카메라에 들어와야 합니다', correctForm: false, landmarks: null }));
           } else {
+            // 각도 판정은 원본 lms 를 그대로 사용 (스무딩 영향 없음)
             const a = analyzePose(exerciseRef.current, lms, seniorRef.current);
             const completed = counterRef.current.update(a.endpoint);
             if (completed) {
@@ -127,6 +131,7 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
               progress: a.progress,
               feedback: a.feedback,
               correctForm: a.correctForm,
+              landmarks: lms, // 그리기용으로 원본 좌표 내보내기 (스무딩은 렌더 직전에 적용)
             }));
           }
         }
@@ -140,6 +145,8 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
+      // 루프 중단 시 마지막 스켈레톤이 화면에 얼어붙지 않게 비움
+      setState(s => ({ ...s, landmarks: null }));
     };
   }, [active, state.ready, videoRef]);
 

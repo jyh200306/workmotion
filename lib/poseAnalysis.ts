@@ -46,6 +46,43 @@ export function findAngle(p1: Landmark, p2: Landmark, p3: Landmark): number {
   return angle;
 }
 
+// ── 화면 그리기 전용: 떨림 보정(EMA 저역통과 필터) ─────────
+//
+// MediaPipe 좌표는 프레임마다 미세하게 흔들립니다(노이즈).
+// 화면에 "그리는 좌표"에만 지수이동평균(EMA)을 적용해 떨림을 줄입니다.
+//   smoothed = prev * (1 - alpha) + now * alpha
+// alpha 가 작을수록 더 부드럽지만(과거 비중↑) 반응이 느려지고,
+// alpha 가 클수록 즉각 반응하지만 떨림이 덜 걸러집니다.
+//
+// ⚠️ 이 함수의 결과는 오직 "그리기용"입니다.
+//    각도 계산·임계값 판정에는 원본 lms 를 그대로 써야 합니다.
+
+/** EMA 스무딩 강도. 0~1, 작을수록 더 부드럽고 느림. (조정 가능 변수) */
+export const SKELETON_SMOOTHING_ALPHA = 0.4;
+
+/**
+ * 직전 보정 좌표(prev)와 새 원본 좌표(now)를 EMA 로 섞어 떨림을 줄인 좌표를 반환.
+ * prev 가 없으면(첫 프레임) now 를 그대로 반환합니다.
+ * x, y, z, visibility 를 모두 보존하며 위치값만 평활화합니다.
+ */
+export function smoothLandmarks(
+  prev: Landmark[] | null,
+  now: Landmark[],
+  alpha: number = SKELETON_SMOOTHING_ALPHA,
+): Landmark[] {
+  if (!prev || prev.length !== now.length) return now;
+  const a = Math.max(0, Math.min(1, alpha));
+  return now.map((cur, i) => {
+    const p = prev[i];
+    return {
+      ...cur,
+      x: p.x * (1 - a) + cur.x * a,
+      y: p.y * (1 - a) + cur.y * a,
+      z: p.z !== undefined && cur.z !== undefined ? p.z * (1 - a) + cur.z * a : cur.z,
+    };
+  });
+}
+
 /** np.interp 대응: value 를 [inMin,inMax] → [outMin,outMax] 로 선형 매핑(클램프). */
 export function interp(
   value: number,
