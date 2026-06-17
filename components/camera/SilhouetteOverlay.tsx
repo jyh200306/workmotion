@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { ExerciseType, ExercisePhase } from '@/types';
 
 // ── 좌표 타입 ──────────────────────────────────────────
@@ -110,6 +111,33 @@ const POSE_MAP: Record<ExerciseType, Record<ExercisePhase, string>> = {
   hip_hinge: { ready: 'standing', active: 'hip_hinge', rest: 'standing' },
 };
 
+// ── 두 자세 사이 보간(애니메이션용) ───────────────────
+// from→to 를 t(0~1) 만큼 섞은 중간 자세를 만듭니다.
+// 모든 좌표를 선형보간(lerp)하고, label/side 는 도착 자세(to) 기준으로 둡니다.
+function lerpN(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+function lerpP(a: P, b: P, t: number): P {
+  return [lerpN(a[0], b[0], t), lerpN(a[1], b[1], t)];
+}
+function lerpL(a: Limb, b: Limb, t: number): Limb {
+  return [lerpP(a[0], b[0], t), lerpP(a[1], b[1], t)];
+}
+function lerpPose(from: Pose, to: Pose, t: number): Pose {
+  return {
+    head:      lerpP(from.head, to.head, t),
+    neck:      lerpL(from.neck, to.neck, t),
+    torso:     lerpL(from.torso, to.torso, t),
+    armUpperL: lerpL(from.armUpperL, to.armUpperL, t), armLowerL: lerpL(from.armLowerL, to.armLowerL, t),
+    armUpperR: lerpL(from.armUpperR, to.armUpperR, t), armLowerR: lerpL(from.armLowerR, to.armLowerR, t),
+    legUpperL: lerpL(from.legUpperL, to.legUpperL, t), legLowerL: lerpL(from.legLowerL, to.legLowerL, t),
+    legUpperR: lerpL(from.legUpperR, to.legUpperR, t), legLowerR: lerpL(from.legLowerR, to.legLowerR, t),
+    footL:     lerpL(from.footL, to.footL, t), footR: lerpL(from.footR, to.footR, t),
+    label:     to.label,
+    side:      to.side,
+  };
+}
+
 // ── 서브 컴포넌트 ──────────────────────────────────────
 function Seg({ a, b, w }: { a: P; b: P; w: number }) {
   return <line x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} strokeWidth={w} />;
@@ -125,14 +153,42 @@ export interface SilhouetteOverlayProps {
   opacity?: number; // 0~100
 }
 
+// 자세 왕복 애니메이션 1회 주기(ms). 작을수록 빠르게 움직입니다.
+const ANIM_PERIOD_MS = 2600;
+
 export function SilhouetteOverlay({
   exerciseType,
   phase,
   opacity = 70,
 }: SilhouetteOverlayProps) {
   const key  = POSE_MAP[exerciseType]?.[phase];
-  const pose = POSES[key];
-  if (!pose) return null;
+  const basePose = POSES[key];
+
+  // 운동 중(active)일 때만 시작자세(standing) ↔ 목표자세 를 왕복 애니메이션.
+  // 그 외(ready/rest)는 정적. 시작자세와 목표자세가 같으면 애니메이션 불필요.
+  const animate = phase === 'active' && key !== 'standing' && !!POSES.standing && !!basePose;
+
+  // rAF 로 진행도 t(0~1)를 핑퐁(사인 ease)으로 갱신
+  const [t, setT] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!animate) { setT(0); return; }
+    const tick = () => {
+      // (sin+1)/2 → 0↔1 부드럽게 왕복(ease in/out)
+      setT((Math.sin((performance.now() / ANIM_PERIOD_MS) * Math.PI * 2) + 1) / 2);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    };
+  }, [animate]);
+
+  if (!basePose) return null;
+
+  // 애니메이션 중이면 보간 자세, 아니면 정적 자세
+  const pose = animate ? lerpPose(POSES.standing, basePose, t) : basePose;
 
   return (
     <div

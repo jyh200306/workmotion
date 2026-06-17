@@ -211,7 +211,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
           )}
           {/* 실시간 사용자 스켈레톤 (운동 중에만, 가이드와 함께 표시) */}
           {stage === 'exercise' && (
-            <PoseSkeletonOverlay landmarks={pose.landmarks} correctForm={pose.correctForm} />
+            <PoseSkeletonOverlay landmarks={pose.landmarks} videoRef={videoRef} correctForm={pose.correctForm} />
           )}
         </CameraFeed>
 

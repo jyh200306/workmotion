@@ -120,7 +120,7 @@ export function usePoseCounter({ exercise, videoRef, active, isSenior = false, o
           } else {
             // 각도 판정은 원본 lms 를 그대로 사용 (스무딩 영향 없음)
             const a = analyzePose(exerciseRef.current, lms, seniorRef.current);
-            const completed = counterRef.current.update(a.endpoint);
+            const completed = counterRef.current.update(a.endpoint, a.progress);
             if (completed) {
               repsRef.current += 1;
               onRepRef.current?.(repsRef.current);

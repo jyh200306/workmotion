@@ -153,12 +153,15 @@ function analyzeDeadlift(lms: Landmark[]): PoseAnalysis {
   // progress 역방향: 숙일수록 100%
   const progress = interp(hip, [60, 170], [100, 0]);
 
-  if (knee < 140)
-    return { progress, correctForm: false, feedback: '무릎을 펴세요 — 스쿼트가 아닌 데드리프트입니다', endpoint: null };
+  // ⚠️ 순서 중요: 정상 down(hip<70 && knee>150)을 폼힌트보다 먼저 판정.
+  // (과거엔 knee<140 폼힌트가 먼저라, 측면 자세에서 무릎이 살짝 굽으면 정상 down 이 차단됐음)
   if (hip < 70 && knee > 150)
     return { progress, correctForm: true, feedback: '좋아요!', endpoint: 'down' };
   if (hip > 160 && knee > 160)
     return { progress, correctForm: true, feedback: '바르게 섰어요', endpoint: 'up' };
+  // 무릎이 과하게 굽음(스쿼트 혼입) — 정상 down 이 아닐 때만 안내 (mvp.md form_error)
+  if (knee < 140)
+    return { progress, correctForm: false, feedback: '무릎을 펴세요 — 스쿼트가 아닌 데드리프트입니다', endpoint: null };
   return { progress, correctForm: true, feedback: '엉덩이를 뒤로 빼며 숙이세요', endpoint: null };
 }
 
@@ -209,23 +212,49 @@ function analyzeHipHinge(lms: Landmark[], senior: boolean): PoseAnalysis {
   return { progress, correctForm: true, feedback: '엉덩이를 뒤로 빼며 숙이세요', endpoint: null };
 }
 
-// ── 반복 카운터 (DOWN +0.5 / UP +0.5 → 1회) ───────────────
+// ── 반복 카운터 (DOWN → UP 복귀 시 1회) ───────────────────
 // down 끝점 도달 → up 끝점 도달 시 1회 완성.
+//
+// [궤적 관용/히스테리시스]
+// 정확히 endpoint='down' 프레임을 잡아야만 인정하면, 힙힌지처럼 down 인정
+// 범위(hip 45~70°, 폭 25°)가 좁은 종목은 프레임 사이로 그 구간을 건너뛰어
+// 카운트가 안 됩니다. 그래서 endpoint 신호 외에, "한 rep 동안 progress 가
+// down 근처(DOWN_ENTER 이상)까지 갔다가 up 근처(UP_EXIT 이하)로 복귀했는지"
+// 라는 궤적도 함께 인정합니다. 두 임계 사이를 벌려(히스테리시스) 떨림에
+// 의한 중복 카운트를 막습니다. 임계값(각도) 자체는 건드리지 않습니다.
+const DOWN_ENTER = 75; // progress 가 이 이상이면 "down 근처 도달"로 래치
+const UP_EXIT    = 20; // progress 가 이 이하로 복귀하면 "올라옴"
+
 export class RepCounter {
   private dir: 'up' | 'down' = 'up';
+  private reachedDown = false; // 이번 rep 에서 down 근처에 도달했는지(궤적)
 
-  /** 분석 결과의 endpoint 를 받아 반복이 완성되면 true 반환 */
-  update(endpoint: 'up' | 'down' | null): boolean {
-    if (endpoint === 'down' && this.dir === 'up') {
+  /**
+   * 분석 결과를 받아 반복이 완성되면 true 반환.
+   * @param endpoint 'down'|'up'|null — 임계값 기반 끝점 신호
+   * @param progress 0~100 — down 에 가까울수록 100 (궤적 관용용)
+   */
+  update(endpoint: 'up' | 'down' | null, progress = 0): boolean {
+    // 1) 끝점 신호 또는 progress 궤적 중 하나라도 down 근처면 래치
+    if (this.dir === 'up' && (endpoint === 'down' || progress >= DOWN_ENTER)) {
       this.dir = 'down';
-    } else if (endpoint === 'up' && this.dir === 'down') {
+      this.reachedDown = true;
+    }
+    // 2) down 을 거친 뒤 up 끝점이거나 progress 가 충분히 내려오면 1회 완성
+    else if (
+      this.dir === 'down' &&
+      this.reachedDown &&
+      (endpoint === 'up' || progress <= UP_EXIT)
+    ) {
       this.dir = 'up';
-      return true; // down → up 복귀 시 1회 완성
+      this.reachedDown = false;
+      return true;
     }
     return false;
   }
 
   reset() {
     this.dir = 'up';
+    this.reachedDown = false;
   }
 }
