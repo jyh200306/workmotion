@@ -76,14 +76,14 @@ export default function HistoryPage() {
 
       {/* 헤더 */}
       <div className="bg-white px-6 pt-14 pb-6">
-        <button onClick={() => router.push('/exercise')} className="flex items-center gap-1.5 text-xl text-[#6b7684] mb-5 active:opacity-60 transition-opacity">
+        <button onClick={() => router.push('/exercise')} className="flex items-center gap-1.5 text-base text-[#6b7684] mb-5 active:opacity-60 transition-opacity">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           돌아가기
         </button>
-        <h1 className="text-[28px] font-bold text-[#202632]">운동 기록</h1>
-        {userName && <p className="text-xl text-[#6b7684] mt-1">{userName}님의 기록</p>}
+        <h1 className="text-2xl font-bold text-[#202632] tracking-tight">운동 기록</h1>
+        {userName && <p className="text-base text-[#6b7684] mt-1">{userName}님의 기록</p>}
 
         {/* 요약 */}
         <div className="grid grid-cols-3 gap-3 mt-5">
@@ -93,9 +93,9 @@ export default function HistoryPage() {
             { label:'운동 일수', value: activeDays,      unit:'일'  },
           ].map(c => (
             <div key={c.label} className="bg-[#f2f4f6] rounded-2xl p-4 text-center">
-              <p className="text-[32px] font-bold text-[#0064ff]">{c.value}</p>
-              <p className="text-base text-[#6b7684] mt-0.5">{c.unit}</p>
-              <p className="text-sm text-[#b0b8c1] mt-0.5">{c.label}</p>
+              <p className="text-2xl font-bold text-[#0064ff] tabular-nums">{c.value}</p>
+              <p className="text-sm text-[#6b7684] mt-0.5">{c.unit}</p>
+              <p className="text-xs text-[#b0b8c1] mt-0.5">{c.label}</p>
             </div>
           ))}
         </div>
@@ -104,17 +104,17 @@ export default function HistoryPage() {
       {/* 기록 목록 */}
       <div className="flex-1 px-5 py-5 flex flex-col gap-5 overflow-y-auto">
         {loading ? (
-          <p className="text-center text-xl text-[#b0b8c1] mt-10 animate-pulse">불러오는 중</p>
+          <p className="text-center text-base text-[#b0b8c1] mt-10 animate-pulse">불러오는 중</p>
         ) : groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center mt-16 gap-4">
             <div className="w-20 h-20 bg-[#ebf3ff] rounded-full flex items-center justify-center text-[#0064ff]">
               <RunIcon size={36} />
             </div>
-            <p className="text-2xl text-[#6b7684]">아직 운동 기록이 없어요</p>
+            <p className="text-lg text-[#6b7684]">아직 운동 기록이 없어요</p>
           </div>
         ) : groups.map(([date, items]) => (
           <div key={date}>
-            <p className="text-lg font-semibold text-[#6b7684] mb-2 px-1">{dateLabel(items[0].started_at)}</p>
+            <p className="text-sm font-semibold text-[#6b7684] mb-2 px-1">{dateLabel(items[0].started_at)}</p>
             <div className="bg-white rounded-2xl border border-[#e5e8eb] overflow-hidden">
               {items.map((s, idx) => {
                 const ex = EX[s.exercise_type];
@@ -124,8 +124,8 @@ export default function HistoryPage() {
                       <ExerciseIcon type={s.exercise_type as ExerciseType} size={24} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-2xl font-semibold text-[#202632]">{ex.name}</p>
-                      <p className="text-lg text-[#6b7684] mt-0.5">{s.sets_completed}세트 · {fmt(s.duration_sec)}</p>
+                      <p className="text-lg font-semibold text-[#202632]">{ex.name}</p>
+                      <p className="text-sm text-[#6b7684] mt-0.5">{s.sets_completed}세트 · {fmt(s.duration_sec)}</p>
                     </div>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#0064ff] shrink-0">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -141,7 +141,7 @@ export default function HistoryPage() {
       {/* 하단 */}
       <div className="px-5 pb-12 pt-2">
         <button onClick={() => router.push('/exercise')}
-          className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-2xl font-bold active:scale-95 transition-transform">
+          className="w-full min-h-[56px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform">
           운동 하러 가기
         </button>
       </div>

@@ -25,6 +25,16 @@ body {
   background: #f2f4f6;
   color: #202632;
   overscroll-behavior: none;
+  /* 모던한 타이포 기본값: 글자 간격 살짝 좁히고 줄간격 정돈 */
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+/* 한글 단어 중간 잘림 방지 — 어절(띄어쓰기) 단위로만 줄바꿈.
+   예) "화면을 바라보세\n요." 같은 글자 단위 끊김을 막는다. */
+:where(h1, h2, h3, h4, p, span, button, label, li, a) {
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 @keyframes pin-pop {

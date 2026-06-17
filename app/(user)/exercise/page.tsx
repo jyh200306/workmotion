@@ -62,15 +62,15 @@ export default function ExercisePage() {
             <span className="text-lg font-bold text-white">{name ? name[0] : 'M'}</span>
           </button>
         </div>
-        <h1 className="text-[28px] font-bold text-[#202632] leading-tight">
+        <h1 className="text-2xl font-bold text-[#202632] leading-tight tracking-tight">
           {name ? `${name}님, 오늘도 화이팅` : '오늘 운동 선택'}
         </h1>
 
         {/* 주간 목표 */}
         <div className="mt-5 pt-5 border-t border-[#f2f4f6]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xl font-semibold text-[#202632]">이번 주 목표</p>
-            <p className="text-lg text-[#0064ff] font-bold">{doneCount}/{goalDays}일</p>
+            <p className="text-lg font-semibold text-[#202632]">이번 주 목표</p>
+            <p className="text-base text-[#0064ff] font-bold tabular-nums">{doneCount}/{goalDays}일</p>
           </div>
           <div className="flex gap-1.5">
             {week.map((d, i) => {
@@ -109,8 +109,8 @@ export default function ExercisePage() {
                 <ExerciseIcon type={ex.type} size={28} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-2xl font-bold text-[#202632]">{ex.name}</p>
-                <p className="text-lg text-[#6b7684] mt-0.5">{ex.desc}</p>
+                <p className="text-lg font-bold text-[#202632]">{ex.name}</p>
+                <p className="text-sm text-[#6b7684] mt-0.5">{ex.desc}</p>
               </div>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#b0b8c1]">
                 <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -123,11 +123,11 @@ export default function ExercisePage() {
       {/* 하단 */}
       <div className="px-5 pb-10 pt-1 flex gap-3">
         <button onClick={() => router.push('/history')}
-          className="flex-1 min-h-[56px] rounded-2xl bg-white border border-[#e5e8eb] text-xl font-semibold text-[#6b7684] active:scale-95 transition-transform">
+          className="flex-1 min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">
           운동 기록
         </button>
         <button onClick={() => router.push('/profile')}
-          className="flex-1 min-h-[56px] rounded-2xl bg-white border border-[#e5e8eb] text-xl font-semibold text-[#6b7684] active:scale-95 transition-transform">
+          className="flex-1 min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">
           내 프로필
         </button>
       </div>

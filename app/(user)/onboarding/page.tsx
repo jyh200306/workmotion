@@ -61,10 +61,10 @@ export default function OnboardingPage() {
 
         {step === 1 && (
           <>
-            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-2">
+            <p className="text-2xl font-bold text-[#202632] leading-tight mb-2 tracking-tight">
               안녕하세요
             </p>
-            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-8">
+            <p className="text-2xl font-bold text-[#202632] leading-tight mb-8 tracking-tight">
               이름이 어떻게 되세요?
             </p>
 
@@ -76,21 +76,21 @@ export default function OnboardingPage() {
                 placeholder="홍길동"
                 maxLength={10}
                 autoFocus
-                className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-[28px] font-semibold
+                className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-xl font-semibold
                            text-[#202632] py-3 placeholder-[#b0b8c1] focus:outline-none
                            focus:border-[#0064ff] transition-colors"
               />
-              {nameError && <p className="text-lg text-[#202632] font-semibold mt-1">{nameError}</p>}
+              {nameError && <p className="text-base text-[#202632] font-semibold mt-1">{nameError}</p>}
             </div>
           </>
         )}
 
         {step === 2 && (
           <>
-            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-2">
+            <p className="text-2xl font-bold text-[#202632] leading-tight mb-2 tracking-tight">
               {name}님,
             </p>
-            <p className="text-[32px] font-bold text-[#202632] leading-tight mb-8">
+            <p className="text-2xl font-bold text-[#202632] leading-tight mb-8 tracking-tight">
               운동 목표가 뭔가요?
             </p>
 
@@ -109,10 +109,10 @@ export default function OnboardingPage() {
                     <g.Icon size={36} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-2xl font-bold ${goal === g.id ? 'text-[#0064ff]' : 'text-[#202632]'}`}>
+                    <p className={`text-lg font-bold ${goal === g.id ? 'text-[#0064ff]' : 'text-[#202632]'}`}>
                       {g.label}
                     </p>
-                    <p className="text-lg text-[#6b7684] mt-0.5">{g.desc}</p>
+                    <p className="text-sm text-[#6b7684] mt-0.5">{g.desc}</p>
                   </div>
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                     goal === g.id ? 'bg-[#0064ff] border-[#0064ff]' : 'border-[#b0b8c1]'
@@ -133,8 +133,8 @@ export default function OnboardingPage() {
               </svg>
             </div>
             <div>
-              <p className="text-[32px] font-bold text-[#202632] mb-3">준비됐어요</p>
-              <p className="text-2xl text-[#6b7684] leading-relaxed">
+              <p className="text-2xl font-bold text-[#202632] mb-3 tracking-tight">준비됐어요</p>
+              <p className="text-base text-[#6b7684] leading-relaxed">
                 카메라 앞에 서면<br />자세를 실시간으로 안내해 드려요
               </p>
             </div>
@@ -145,8 +145,8 @@ export default function OnboardingPage() {
                 { Icon: BellIcon,   text: '세트 완료 안내음이 울려요' },
               ].map(t => (
                 <div key={t.text} className="flex items-center gap-3">
-                  <span className="text-[#0064ff] shrink-0"><t.Icon size={24} /></span>
-                  <p className="text-xl text-[#202632]">{t.text}</p>
+                  <span className="text-[#0064ff] shrink-0"><t.Icon size={22} /></span>
+                  <p className="text-base text-[#202632]">{t.text}</p>
                 </div>
               ))}
             </div>
@@ -159,7 +159,7 @@ export default function OnboardingPage() {
         <button
           onClick={goNext}
           disabled={!canNext}
-          className="w-full min-h-[60px] rounded-2xl text-2xl font-bold transition-all duration-150
+          className="w-full min-h-[56px] rounded-2xl text-lg font-bold transition-all duration-150
                      active:scale-95 bg-[#0064ff] text-white disabled:bg-[#b0b8c1]"
         >
           {step === 3 ? '운동 시작' : '다음'}

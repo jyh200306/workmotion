@@ -190,16 +190,16 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
     <div className="h-screen flex flex-col bg-black overflow-hidden">
 
       {/* 헤더 */}
-      <div className="bg-[#111] px-5 py-4 flex items-center justify-between shrink-0 border-b border-white/10">
-        <button onClick={() => router.push('/exercise')} className="text-white/60 text-xl active:opacity-50 transition-opacity px-1">
+      <div className="bg-[#111] px-5 py-3.5 flex items-center justify-between shrink-0 border-b border-white/10">
+        <button onClick={() => router.push('/exercise')} className="text-white/60 text-base active:opacity-50 transition-opacity px-1">
           나가기
         </button>
         <div className="flex items-center gap-2 text-white">
-          <ExerciseIcon type={exType} size={22} />
-          <span className="text-white text-xl font-semibold">{info.name}</span>
+          <ExerciseIcon type={exType} size={20} />
+          <span className="text-white text-lg font-semibold tracking-tight">{info.name}</span>
         </div>
-        <div className="bg-white/10 px-4 py-2 rounded-xl min-w-[68px] text-center">
-          <span className="text-white text-xl font-bold">{sets}/{TOTAL_SETS}</span>
+        <div className="bg-white/10 px-3.5 py-1.5 rounded-lg min-w-[60px] text-center">
+          <span className="text-white text-base font-bold tabular-nums">{sets}/{TOTAL_SETS}</span>
         </div>
       </div>
 
@@ -217,8 +217,8 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
         {/* 단계 뱃지 */}
         {stage !== 'ready' && stage !== 'done' && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <span className={`px-5 py-2 rounded-full text-lg font-semibold text-white backdrop-blur-sm ${
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <span className={`px-3.5 py-1 rounded-full text-sm font-semibold text-white backdrop-blur-sm ${
               stage === 'exercise' ? 'bg-[#0064ff]/80' : 'bg-[#6b7684]/80'
             }`}>
               {stage === 'exercise' ? '운동 중' : '휴식 중'}
@@ -231,15 +231,15 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
           <>
             {/* 반복 횟수 (좌하단) */}
             <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
-              <div className="bg-black/60 rounded-2xl px-5 py-3 backdrop-blur-sm flex items-baseline gap-1.5">
-                <span className="text-[#4d94ff] text-5xl font-bold leading-none">{pose.reps}</span>
-                <span className="text-white/60 text-2xl font-semibold">/ {goalReps}회</span>
+              <div className="bg-black/55 rounded-xl px-4 py-2.5 backdrop-blur-sm flex items-baseline gap-1">
+                <span className="text-[#4d94ff] text-4xl font-bold leading-none tabular-nums">{pose.reps}</span>
+                <span className="text-white/60 text-lg font-semibold">/ {goalReps}회</span>
               </div>
             </div>
 
             {/* 진행도 세로 막대 (우측) */}
             <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none">
-              <div className="w-3 h-48 bg-black/40 rounded-full overflow-hidden flex flex-col-reverse">
+              <div className="w-2.5 h-44 bg-black/40 rounded-full overflow-hidden flex flex-col-reverse">
                 <div
                   className="w-full bg-[#4d94ff] rounded-full transition-all duration-150"
                   style={{ height: `${pose.progress}%` }}
@@ -248,9 +248,9 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
             </div>
 
             {/* 자세 피드백 (상단, 단계 뱃지 아래) */}
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-              <span className={`px-4 py-1.5 rounded-full text-lg font-semibold backdrop-blur-sm ${
-                pose.correctForm ? 'bg-[#0064ff]/80 text-white' : 'bg-[#6b7684]/85 text-white'
+            <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none max-w-[90%]">
+              <span className={`block px-3.5 py-1 rounded-full text-sm font-medium text-center backdrop-blur-sm text-white ${
+                pose.correctForm ? 'bg-[#0064ff]/80' : 'bg-[#6b7684]/85'
               }`}>
                 {pose.feedback}
               </span>
@@ -260,15 +260,15 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
         {/* 자세 인식 로딩 / 오류 안내 */}
         {stage === 'exercise' && !pose.ready && !pose.error && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <span className="bg-black/60 text-white/80 text-base px-4 py-1.5 rounded-full backdrop-blur-sm">
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <span className="bg-black/55 text-white/80 text-sm px-3.5 py-1 rounded-full backdrop-blur-sm">
               자세 인식 준비 중…
             </span>
           </div>
         )}
         {pose.error && stage === 'exercise' && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <span className="bg-black/60 text-white/70 text-sm px-4 py-1.5 rounded-full backdrop-blur-sm">
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <span className="bg-black/55 text-white/70 text-sm px-3.5 py-1 rounded-full backdrop-blur-sm">
               타이머 모드로 진행합니다
             </span>
           </div>
@@ -277,8 +277,8 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         {/* 시작 전 팁 */}
         {stage === 'ready' && (
           <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none">
-            <div className="bg-black/60 rounded-2xl px-5 py-3 backdrop-blur-sm">
-              <p className="text-white/90 text-xl text-center">{TIPS[exType]}</p>
+            <div className="bg-black/55 rounded-xl px-4 py-2.5 backdrop-blur-sm">
+              <p className="text-white/90 text-base text-center leading-snug">{TIPS[exType]}</p>
             </div>
           </div>
         )}
@@ -286,14 +286,14 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         {/* 완료 오버레이 */}
         {stage === 'done' && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/70">
-            <div className="bg-white rounded-3xl px-8 py-8 flex flex-col items-center gap-4 mx-6">
-              <div className="w-20 h-20 bg-[#ebf3ff] rounded-full flex items-center justify-center">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <div className="bg-white rounded-3xl px-8 py-7 flex flex-col items-center gap-3 mx-6">
+              <div className="w-16 h-16 bg-[#ebf3ff] rounded-full flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                   <path d="M20 6L9 17l-5-5" stroke="#0064ff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <p className="text-[28px] font-bold text-[#202632]">운동 완료!</p>
-              <p className="text-xl text-[#6b7684]">{TOTAL_SETS}세트 모두 마쳤어요</p>
+              <p className="text-2xl font-bold text-[#202632] tracking-tight">운동 완료!</p>
+              <p className="text-base text-[#6b7684]">{TOTAL_SETS}세트 모두 마쳤어요</p>
             </div>
           </div>
         )}
@@ -304,7 +304,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
         {stage === 'ready' && (
           <button onClick={handleStart}
-            className="w-full min-h-[68px] rounded-2xl bg-[#0064ff] text-white text-2xl font-bold active:scale-95 transition-transform">
+            className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform">
             운동 시작
           </button>
         )}
@@ -312,7 +312,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         {(stage === 'exercise' || stage === 'rest') && (
           <div className="flex items-center gap-4">
             {/* 원형 타이머 */}
-            <div className="relative w-28 h-28 shrink-0">
+            <div className="relative w-24 h-24 shrink-0">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="52" fill="none" stroke="#2a2a2a" strokeWidth="8"/>
                 <circle cx="60" cy="60" r="52" fill="none"
@@ -325,19 +325,19 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-5xl font-bold text-white leading-none">{timeLeft}</span>
-                <span className="text-sm text-white/50 mt-0.5">초</span>
+                <span className="text-4xl font-bold text-white leading-none tabular-nums">{timeLeft}</span>
+                <span className="text-xs text-white/50 mt-0.5">초</span>
               </div>
             </div>
 
             <div className="flex-1 flex flex-col gap-2.5">
               <button onClick={togglePause}
-                className={`min-h-[56px] rounded-2xl text-xl font-semibold text-white active:scale-95 transition-transform
+                className={`min-h-[52px] rounded-xl text-base font-semibold text-white active:scale-95 transition-transform
                             ${paused ? 'bg-[#0064ff]' : 'bg-white/10'}`}>
                 {paused ? '계속하기' : '일시정지'}
               </button>
               <button onClick={() => router.push('/exercise')}
-                className="min-h-[56px] rounded-2xl text-xl font-semibold text-white/60 bg-white/5 active:scale-95 transition-transform">
+                className="min-h-[52px] rounded-xl text-base font-semibold text-white/60 bg-white/5 active:scale-95 transition-transform">
                 운동 종료
               </button>
             </div>
@@ -346,7 +346,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
         {stage === 'done' && (
           <button onClick={() => router.push('/exercise')}
-            className="w-full min-h-[68px] rounded-2xl bg-[#0064ff] text-white text-2xl font-bold active:scale-95 transition-transform">
+            className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform">
             완료하기
           </button>
         )}
@@ -354,11 +354,11 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
         {/* 실루엣 투명도 */}
         {stage !== 'done' && (
           <div className="flex items-center gap-3 pt-1">
-            <span className="text-white/40 text-lg">가이드</span>
+            <span className="text-white/40 text-sm">가이드</span>
             <input type="range" min={0} max={100} value={silOpacity}
               onChange={e => setSilOpacity(Number(e.target.value))}
               className="flex-1 h-1.5 accent-[#0064ff] cursor-pointer" />
-            <span className="text-white/40 text-lg w-10 text-right">{silOpacity}%</span>
+            <span className="text-white/40 text-sm w-9 text-right tabular-nums">{silOpacity}%</span>
           </div>
         )}
       </div>

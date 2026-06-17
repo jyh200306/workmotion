@@ -78,7 +78,7 @@ export default function ProfilePage() {
 
       {/* 헤더 */}
       <div className="bg-white px-6 pt-14 pb-6">
-        <button onClick={() => router.push('/exercise')} className="flex items-center gap-1.5 text-xl text-[#6b7684] mb-5 active:opacity-60 transition-opacity">
+        <button onClick={() => router.push('/exercise')} className="flex items-center gap-1.5 text-base text-[#6b7684] mb-5 active:opacity-60 transition-opacity">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
@@ -90,13 +90,13 @@ export default function ProfilePage() {
             <span className="text-2xl font-bold text-[#0064ff]">{user?.name?.[0] ?? 'M'}</span>
           </div>
           <div>
-            <h1 className="text-[26px] font-bold text-[#202632]">{user?.name ?? '이용자'}님</h1>
+            <h1 className="text-2xl font-bold text-[#202632] tracking-tight">{user?.name ?? '이용자'}님</h1>
             <div className="flex items-center gap-2 mt-1">
-              {age && <p className="text-lg text-[#6b7684]">{age}세</p>}
+              {age && <p className="text-base text-[#6b7684]">{age}세</p>}
               {goal && (
                 <>
                   {age && <span className="text-[#b0b8c1]">·</span>}
-                  <p className="text-lg text-[#6b7684]">{GOAL_LABELS[goal] ?? goal}</p>
+                  <p className="text-base text-[#6b7684]">{GOAL_LABELS[goal] ?? goal}</p>
                 </>
               )}
             </div>
@@ -114,16 +114,16 @@ export default function ProfilePage() {
             { label:'총 세트',  value:`${totalSets}세트`,     Icon: StackIcon },
           ].map(c => (
             <div key={c.label} className="bg-white rounded-2xl border border-[#e5e8eb] p-4 text-center">
-              <c.Icon size={24} className="mx-auto mb-1.5 text-[#0064ff]" />
-              <p className="text-2xl font-bold text-[#202632]">{c.value}</p>
-              <p className="text-sm text-[#b0b8c1] mt-0.5">{c.label}</p>
+              <c.Icon size={22} className="mx-auto mb-1.5 text-[#0064ff]" />
+              <p className="text-xl font-bold text-[#202632] tabular-nums">{c.value}</p>
+              <p className="text-xs text-[#b0b8c1] mt-0.5">{c.label}</p>
             </div>
           ))}
         </div>
 
         {/* 이번 주 */}
         <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-          <p className="text-xl font-bold text-[#202632] mb-4">이번 주 운동</p>
+          <p className="text-lg font-bold text-[#202632] mb-4">이번 주 운동</p>
           <div className="flex gap-1.5">
             {week.map((d, i) => {
               const done    = weekDone.has(d);
@@ -154,8 +154,8 @@ export default function ProfilePage() {
               <ExerciseIcon type={favEx as ExerciseType} size={26} />
             </div>
             <div>
-              <p className="text-lg text-[#6b7684]">가장 많이 한 운동</p>
-              <p className="text-2xl font-bold text-[#202632]">{EX[favEx].name}</p>
+              <p className="text-sm text-[#6b7684]">가장 많이 한 운동</p>
+              <p className="text-lg font-bold text-[#202632]">{EX[favEx].name}</p>
             </div>
           </div>
         )}
@@ -164,8 +164,8 @@ export default function ProfilePage() {
         {sessions.length > 0 && (
           <div className="bg-white rounded-2xl border border-[#e5e8eb] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#f2f4f6]">
-              <p className="text-xl font-bold text-[#202632]">최근 기록</p>
-              <button onClick={() => router.push('/history')} className="text-lg text-[#0064ff] font-semibold active:opacity-60 transition-opacity">
+              <p className="text-lg font-bold text-[#202632]">최근 기록</p>
+              <button onClick={() => router.push('/history')} className="text-sm text-[#0064ff] font-semibold active:opacity-60 transition-opacity">
                 전체 보기
               </button>
             </div>
@@ -178,10 +178,10 @@ export default function ProfilePage() {
                     {known ? <ExerciseIcon type={s.exercise_type as ExerciseType} size={20} /> : <RunIcon size={20} />}
                   </span>
                   <div className="flex-1">
-                    <p className="text-2xl font-semibold text-[#202632]">{ex.name}</p>
-                    <p className="text-lg text-[#6b7684]">{s.sets_completed}세트</p>
+                    <p className="text-lg font-semibold text-[#202632]">{ex.name}</p>
+                    <p className="text-sm text-[#6b7684]">{s.sets_completed}세트</p>
                   </div>
-                  <p className="text-lg text-[#b0b8c1]">
+                  <p className="text-sm text-[#b0b8c1]">
                     {new Date(s.started_at).toLocaleDateString('ko-KR', { month:'short', day:'numeric' })}
                   </p>
                 </div>
@@ -192,7 +192,7 @@ export default function ProfilePage() {
 
         {/* 로그아웃 */}
         <button onClick={logout}
-          className="w-full min-h-[56px] rounded-2xl bg-white border border-[#e5e8eb] text-xl font-semibold text-[#6b7684] active:scale-95 transition-transform mt-2">
+          className="w-full min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform mt-2">
           로그아웃
         </button>
       </div>

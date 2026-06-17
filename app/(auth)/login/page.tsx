@@ -65,8 +65,8 @@ export default function LoginPage() {
             <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="white" strokeLinejoin="round"/>
           </svg>
         </div>
-        <h1 className="text-[28px] font-bold text-[#202632] tracking-tight">WorkMotion</h1>
-        <p className="text-xl text-[#6b7684] mt-2">PIN 번호 4자리를 눌러주세요</p>
+        <h1 className="text-2xl font-bold text-[#202632] tracking-tight">WorkMotion</h1>
+        <p className="text-base text-[#6b7684] mt-2">PIN 번호 4자리를 눌러주세요</p>
       </div>
 
       {/* PIN 도트 */}
@@ -85,8 +85,8 @@ export default function LoginPage() {
 
       {/* 에러 */}
       <div className="h-9 flex items-center justify-center px-8">
-        {error   && <p className="text-lg text-[#202632] font-semibold">{error}</p>}
-        {loading && <p className="text-lg text-[#b0b8c1]">확인 중</p>}
+        {error   && <p className="text-base text-[#202632] font-semibold">{error}</p>}
+        {loading && <p className="text-base text-[#b0b8c1]">확인 중</p>}
       </div>
 
       {/* 키패드 */}
@@ -97,10 +97,10 @@ export default function LoginPage() {
               key={i}
               onClick={() => handleKey(key)}
               disabled={key === '' || loading}
-              className={`min-h-[72px] rounded-2xl text-[28px] font-semibold transition-all duration-100 active:scale-90
+              className={`min-h-[68px] rounded-2xl text-2xl font-semibold transition-all duration-100 active:scale-90
                 ${key === '' ? 'invisible' : ''}
                 ${key === '←'
-                  ? 'bg-[#f2f4f6] text-[#6b7684] text-2xl'
+                  ? 'bg-[#f2f4f6] text-[#6b7684] text-xl'
                   : 'bg-[#f2f4f6] text-[#202632] active:bg-[#e5e8eb]'}
                 disabled:opacity-40`}
             >
@@ -110,7 +110,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <p className="text-center text-lg text-[#b0b8c1] pb-12">WorkMotion © 2026</p>
+      <p className="text-center text-sm text-[#b0b8c1] pb-12">WorkMotion © 2026</p>
     </main>
   );
 }

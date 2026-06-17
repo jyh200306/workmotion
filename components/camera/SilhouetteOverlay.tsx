@@ -260,19 +260,11 @@ export function SilhouetteOverlay({
         </g>
       </svg>
 
-      {/* 측면 자세 안내 배지 (상단) — 단계 뱃지·피드백과 겹치지 않게 아래쪽에 배치 */}
-      {pose.side && (
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="bg-[#0064ff]/85 text-white text-xl font-bold px-5 py-2 rounded-full backdrop-blur-sm shadow-lg">
-            ↻ 측면을 보세요
-          </span>
-        </div>
-      )}
-
-      {/* 자세 레이블 (하단) */}
+      {/* 자세 레이블 (하단) — 화면을 가리지 않게 작게 하나만.
+          측면 자세면 "측면을 보세요"만 간결히 안내(자세명은 생략해 길이 최소화). */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
-        <span className="bg-black/50 text-[#4d94ff] text-xl font-bold px-4 py-1.5 rounded-full backdrop-blur-sm">
-          {pose.side ? `측면을 보세요 · ${pose.label}` : pose.label}
+        <span className="bg-black/45 text-white/90 text-sm font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+          {pose.side ? '측면을 보세요' : pose.label}
         </span>
       </div>
     </div>
