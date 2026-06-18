@@ -38,9 +38,8 @@ const TIPS: Record<ExerciseType, string> = {
 
 const VALID: ExerciseType[] = ['squat', 'deadlift', 'lunge', 'hip_hinge'];
 const TOTAL_SETS    = 3;
-const SET_SEC       = 20;
-const REST_SEC      = 8;
-const COUNTDOWN_SEC = 5;  // 운동 시작 전 준비 카운트다운
+const REST_SEC      = 10;  // 세트 사이 휴식
+const COUNTDOWN_SEC = 5;   // 운동 시작 전 준비 카운트다운
 
 // 한 세트 목표 반복 횟수 — 자세 인식이 동작할 때 이 횟수를 채우면 세트 완료
 const REPS_PER_SET: Record<ExerciseType, number> = {
@@ -57,7 +56,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   const [stage,      setStage]      = useState<Stage>('ready');
   const [sets,       setSets]       = useState(0);
-  const [timeLeft,   setTimeLeft]   = useState(SET_SEC);
+  const [timeLeft,   setTimeLeft]   = useState(REST_SEC); // 휴식 카운트다운 표시용
   const [countdown,  setCountdown]  = useState(COUNTDOWN_SEC); // 시작 전 5초 카운트다운 표시
   const [paused,     setPaused]     = useState(false);
   const [isSenior,   setIsSenior]   = useState(false); // 60세 이상 → 완화 임계값 (mvp.md)
@@ -139,11 +138,11 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   const completingRef = useRef(false); // 세트 완료 중복 처리 가드
 
+  // 목표 반복 횟수 달성 시 세트 완료 (운동 중 타이머 없음 — 횟수로만 완료)
   const onSetDone = useCallback(() => {
-    // 타이머 만료와 목표 반복 달성이 동시에 발생해도 한 번만 처리
+    // 중복 호출 방지 가드
     if (completingRef.current) return;
     completingRef.current = true;
-    clearTimer();
 
     setSets(prev => {
       const next = prev + 1;
@@ -155,12 +154,12 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
       } else {
         setStage('rest');
         speak(`${next}세트 완료! ${REST_SEC}초 쉬어가요.`);
+        // 휴식 카운트다운 종료 후 다음 세트 시작 (세트 타이머 없이 횟수만 카운트)
         startCountdown(REST_SEC, () => {
           pose.resetReps();
           completingRef.current = false;
           setStage('exercise');
           speak('다음 세트 시작합니다');
-          startCountdown(SET_SEC, onSetDoneRef.current);
         });
       }
       return next;
@@ -171,14 +170,13 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   // ── 시작 전 5초 카운트다운 → "운동 시작" 음성 → 실제 운동 시작 ──────────
 
-  // 실제 운동 시작 로직 (카메라 자세 인식 + 세트 타이머)
+  // 실제 운동 시작 로직 (카메라 자세 인식만 — 세트 타이머 없이 목표 횟수로 완료)
   const beginExercise = useCallback(() => {
     startTimeRef.current = Date.now();
     completingRef.current = false;
     pose.resetReps();
     setStage('exercise');
-    startCountdown(SET_SEC, onSetDoneRef.current);
-  }, [pose, startCountdown]);
+  }, [pose]);
 
   // 의존성 순환을 피하기 위해 ref로 참조 (onSetDoneRef 패턴과 동일)
   const beginExerciseRef = useRef<() => void>(() => {});
@@ -217,21 +215,24 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   function togglePause() {
     if (paused) {
       setPaused(false);
-      intervalRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) { clearTimer(); return 0; }
-          return prev - 1;
-        });
-      }, 1000);
+      // 휴식 중이었다면 휴식 타이머 재개 (운동 중에는 타이머 없음 → 자세 인식만 재개)
+      if (stage === 'rest') {
+        intervalRef.current = setInterval(() => {
+          setTimeLeft(prev => {
+            if (prev <= 1) { clearTimer(); return 0; }
+            return prev - 1;
+          });
+        }, 1000);
+      }
     } else {
       setPaused(true);
       clearTimer();
     }
   }
 
-  const totalTime = stage === 'rest' ? REST_SEC : SET_SEC;
-  const progress  = (stage === 'ready' || stage === 'done') ? 0 : (1 - timeLeft / totalTime) * 100;
-  const circum    = 2 * Math.PI * 52;
+  // 휴식 타이머 진행도 (운동 중에는 타이머 없음)
+  const progress = stage === 'rest' ? (1 - timeLeft / REST_SEC) * 100 : 0;
+  const circum   = 2 * Math.PI * 52;
 
   return (
     <div className="h-screen flex flex-col bg-black overflow-hidden">
@@ -270,17 +271,9 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
           </div>
         )}
 
-        {/* 실시간 반복 카운트 + 진행도 (운동 중, 자세 인식 동작 시) */}
+        {/* 실시간 진행도 + 자세 피드백 (운동 중, 자세 인식 동작 시) — 횟수는 하단 컨트롤에 표시 */}
         {stage === 'exercise' && pose.ready && (
           <>
-            {/* 반복 횟수 (좌하단) */}
-            <div className="absolute bottom-4 left-4 z-20 pointer-events-none">
-              <div className="bg-black/55 rounded-xl px-4 py-2.5 backdrop-blur-sm flex items-baseline gap-1">
-                <span className="text-[#4d94ff] text-4xl font-bold leading-none tabular-nums">{pose.reps}</span>
-                <span className="text-white/60 text-lg font-semibold">/ {goalReps}회</span>
-              </div>
-            </div>
-
             {/* 진행도 세로 막대 (우측) */}
             <div className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none">
               <div className="w-2.5 h-44 bg-black/40 rounded-full overflow-hidden flex flex-col-reverse">
@@ -368,24 +361,32 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
         {(stage === 'exercise' || stage === 'rest') && (
           <div className="flex items-center gap-4">
-            {/* 원형 타이머 */}
-            <div className="relative w-24 h-24 shrink-0">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="#2a2a2a" strokeWidth="8"/>
-                <circle cx="60" cy="60" r="52" fill="none"
-                  stroke={stage === 'rest' ? '#6b7684' : '#0064ff'}
-                  strokeWidth="8"
-                  strokeDasharray={circum}
-                  strokeDashoffset={circum * (1 - progress / 100)}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-bold text-white leading-none tabular-nums">{timeLeft}</span>
-                <span className="text-xs text-white/50 mt-0.5">초</span>
+            {stage === 'rest' ? (
+              /* 휴식 원형 타이머 */
+              <div className="relative w-24 h-24 shrink-0">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#2a2a2a" strokeWidth="8"/>
+                  <circle cx="60" cy="60" r="52" fill="none"
+                    stroke="#6b7684"
+                    strokeWidth="8"
+                    strokeDasharray={circum}
+                    strokeDashoffset={circum * (1 - progress / 100)}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold text-white leading-none tabular-nums">{timeLeft}</span>
+                  <span className="text-xs text-white/50 mt-0.5">초</span>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* 운동 중 횟수 카운트 (타이머 없음 — 목표 횟수로 세트 완료) */
+              <div className="w-24 h-24 shrink-0 rounded-full bg-white/5 flex flex-col items-center justify-center">
+                <span className="text-4xl font-bold text-[#4d94ff] leading-none tabular-nums">{pose.reps}</span>
+                <span className="text-xs text-white/50 mt-0.5">/ {goalReps}회</span>
+              </div>
+            )}
 
             <div className="flex-1 flex flex-col gap-2.5">
               <button onClick={togglePause}
