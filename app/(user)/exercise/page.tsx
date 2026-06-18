@@ -50,27 +50,27 @@ export default function ExercisePage() {
   const doneCount = week.filter(d => weekDone.has(d)).length;
 
   return (
-    <main className="min-h-screen bg-[#f2f4f6] flex flex-col">
+    <main className="min-h-screen bg-[#14181d] flex flex-col">
 
       {/* 헤더 */}
-      <div className="bg-white px-6 pt-14 pb-6">
+      <div className="bg-[#1a2026] px-6 pt-14 pb-6">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-lg text-[#b0b8c1]">{todayStr}</p>
+          <p className="text-lg text-[#6a6a6a]">{todayStr}</p>
           <button
             onClick={() => router.push('/profile')}
-            className="w-11 h-11 rounded-full bg-[#0064ff] flex items-center justify-center active:opacity-75 transition-opacity">
-            <span className="text-lg font-bold text-white">{name ? name[0] : 'M'}</span>
+            className="w-11 h-11 rounded-full bg-[#d8ff36] flex items-center justify-center active:opacity-75 transition-opacity">
+            <span className="text-lg font-bold text-[#14181d]">{name ? name[0] : 'M'}</span>
           </button>
         </div>
-        <h1 className="text-2xl font-bold text-[#202632] leading-tight tracking-tight">
+        <h1 className="text-2xl font-bold text-[#f0f0f0] leading-tight tracking-tight">
           {name ? `${name}님, 오늘도 화이팅` : '오늘 운동 선택'}
         </h1>
 
         {/* 주간 목표 */}
-        <div className="mt-5 pt-5 border-t border-[#f2f4f6]">
+        <div className="mt-5 pt-5 border-t border-[#2a3139]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-lg font-semibold text-[#202632]">이번 주 목표</p>
-            <p className="text-base text-[#0064ff] font-bold tabular-nums">{doneCount}/{goalDays}일</p>
+            <p className="text-lg font-semibold text-[#f0f0f0]">이번 주 목표</p>
+            <p className="text-base text-[#d8ff36] font-bold tabular-nums">{doneCount}/{goalDays}일</p>
           </div>
           <div className="flex gap-1.5">
             {week.map((d, i) => {
@@ -79,13 +79,13 @@ export default function ExercisePage() {
               const label   = ['일','월','화','수','목','금','토'][new Date(d + 'T12:00:00').getDay()];
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                  <p className={`text-sm font-medium ${isToday ? 'text-[#0064ff]' : 'text-[#b0b8c1]'}`}>{label}</p>
+                  <p className={`text-sm font-medium ${isToday ? 'text-[#d8ff36]' : 'text-[#6a6a6a]'}`}>{label}</p>
                   <div className={`w-full aspect-square rounded-lg flex items-center justify-center ${
-                    done ? 'bg-[#0064ff]' : isToday ? 'bg-[#ebf3ff] border border-[#0064ff]' : 'bg-[#f2f4f6]'
+                    done ? 'bg-[#d8ff36]' : isToday ? 'bg-[#23291a] border border-[#d8ff36]' : 'bg-[#2a3139]'
                   }`}>
                     {done && (
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M20 6L9 17l-5-5" stroke="#14181d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                   </div>
@@ -102,17 +102,17 @@ export default function ExercisePage() {
           <button
             key={ex.type}
             onClick={() => router.push(`/exercise/${ex.type}/guide`)}
-            className="w-full bg-white rounded-2xl border border-[#e5e8eb] active:scale-[0.98] transition-transform duration-100 text-left overflow-hidden"
+            className="w-full bg-[#1a2026] rounded-2xl border border-[#2a3139] active:scale-[0.98] transition-transform duration-100 text-left overflow-hidden"
           >
             <div className="flex items-center gap-5 px-5 py-5">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-[#ebf3ff] text-[#0064ff]">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-[#23291a] text-[#d8ff36]">
                 <ExerciseIcon type={ex.type} size={28} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-lg font-bold text-[#202632]">{ex.name}</p>
-                <p className="text-sm text-[#6b7684] mt-0.5">{ex.desc}</p>
+                <p className="text-lg font-bold text-[#f0f0f0]">{ex.name}</p>
+                <p className="text-sm text-[#a0a0a0] mt-0.5">{ex.desc}</p>
               </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#b0b8c1]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#6a6a6a]">
                 <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
@@ -123,11 +123,11 @@ export default function ExercisePage() {
       {/* 하단 */}
       <div className="px-5 pb-10 pt-1 flex gap-3">
         <button onClick={() => router.push('/history')}
-          className="flex-1 min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">
+          className="flex-1 min-h-[52px] rounded-2xl bg-[#1a2026] border border-[#2a3139] text-base font-semibold text-[#a0a0a0] active:scale-95 transition-transform">
           운동 기록
         </button>
         <button onClick={() => router.push('/profile')}
-          className="flex-1 min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">
+          className="flex-1 min-h-[52px] rounded-2xl bg-[#1a2026] border border-[#2a3139] text-base font-semibold text-[#a0a0a0] active:scale-95 transition-transform">
           내 프로필
         </button>
       </div>

@@ -18,7 +18,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#ffffff",
+  themeColor: "#14181d",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
-      <body className="min-h-full flex flex-col bg-[#f2f4f6]">
+      <body className="min-h-full flex flex-col bg-[#14181d]">
         {children}
       </body>
     </html>

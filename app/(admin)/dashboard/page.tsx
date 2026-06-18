@@ -72,10 +72,10 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#f2f4f6]">
-          <h2 className="text-xl font-bold text-[#202632] tracking-tight">이용자 등록</h2>
-          <button onClick={onClose} aria-label="닫기" className="text-[#6b7684] active:opacity-60 w-10 h-10 flex items-center justify-center">
+      <div className="bg-[#1a2026] w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#2a3139]">
+          <h2 className="text-xl font-bold text-[#f0f0f0] tracking-tight">이용자 등록</h2>
+          <button onClick={onClose} aria-label="닫기" className="text-[#a0a0a0] active:opacity-60 w-10 h-10 flex items-center justify-center">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -84,39 +84,39 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
 
         <div className="px-6 py-6 flex flex-col gap-5">
           <div>
-            <label className="text-sm font-semibold text-[#6b7684] mb-2 block">이름 <span className="text-[#0064ff]">*</span></label>
+            <label className="text-sm font-semibold text-[#a0a0a0] mb-2 block">이름 <span className="text-[#d8ff36]">*</span></label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="홍길동"
-              className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-xl font-semibold text-[#202632] py-2 placeholder-[#b0b8c1] focus:outline-none focus:border-[#0064ff] transition-colors" />
+              className="w-full border-b-2 border-[#2a3139] bg-transparent text-xl font-semibold text-[#f0f0f0] py-2 placeholder-[#6a6a6a] focus:outline-none focus:border-[#d8ff36] transition-colors" />
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-[#6b7684] mb-2 block">출생년도 <span className="text-[#b0b8c1] font-normal text-xs">(선택)</span></label>
+            <label className="text-sm font-semibold text-[#a0a0a0] mb-2 block">출생년도 <span className="text-[#6a6a6a] font-normal text-xs">(선택)</span></label>
             <input type="number" value={birthYear} onChange={e => setBirthYear(e.target.value)} placeholder="1950" min={1920} max={2010}
-              className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-xl font-semibold text-[#202632] py-2 placeholder-[#b0b8c1] focus:outline-none focus:border-[#0064ff] transition-colors" />
+              className="w-full border-b-2 border-[#2a3139] bg-transparent text-xl font-semibold text-[#f0f0f0] py-2 placeholder-[#6a6a6a] focus:outline-none focus:border-[#d8ff36] transition-colors" />
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-[#6b7684] mb-3 block">PIN 4자리 <span className="text-[#0064ff]">*</span></label>
+            <label className="text-sm font-semibold text-[#a0a0a0] mb-3 block">PIN 4자리 <span className="text-[#d8ff36]">*</span></label>
             <div className="flex gap-3 mb-4 justify-center">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className={`w-4 h-4 rounded-full transition-all ${i < pinKeys.length ? 'bg-[#0064ff]' : 'bg-[#e5e8eb]'}`} />
+                <div key={i} className={`w-4 h-4 rounded-full transition-all ${i < pinKeys.length ? 'bg-[#d8ff36]' : 'bg-[#2a3139]'}`} />
               ))}
             </div>
             <div className="grid grid-cols-3 gap-2">
               {KEYS.map((key, i) => (
                 <button key={i} onClick={() => handlePinKey(key)} disabled={key === ''}
                   className={`min-h-[52px] rounded-xl text-xl font-semibold transition-all active:scale-90
-                    ${key === '' ? 'invisible' : key === '←' ? 'bg-[#f2f4f6] text-[#6b7684] text-lg' : 'bg-[#f2f4f6] text-[#202632]'}`}>
+                    ${key === '' ? 'invisible' : key === '←' ? 'bg-[#14181d] text-[#a0a0a0] text-lg' : 'bg-[#14181d] text-[#f0f0f0]'}`}>
                   {key}
                 </button>
               ))}
             </div>
           </div>
 
-          {error && <p className="text-base text-[#202632] bg-[#f2f4f6] rounded-xl py-3 text-center">{error}</p>}
+          {error && <p className="text-base text-[#e05260] bg-[#14181d] rounded-xl py-3 text-center">{error}</p>}
 
           <button onClick={submit} disabled={loading}
-            className="w-full min-h-[56px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform disabled:opacity-40">
+            className="w-full min-h-[56px] rounded-2xl bg-[#d8ff36] text-[#14181d] text-lg font-bold active:scale-95 transition-transform disabled:opacity-40">
             {loading ? '등록 중' : '등록하기'}
           </button>
         </div>
@@ -128,12 +128,12 @@ function RegisterModal({ facilityId, onClose, onSuccess }: { facilityId: string;
 function DeleteModal({ user, onClose, onConfirm }: { user: UserRow; onClose: () => void; onConfirm: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white rounded-3xl p-8 w-full max-w-sm flex flex-col items-center gap-5">
-        <p className="text-xl font-bold text-[#202632] text-center tracking-tight">{user.name}님의 정보를<br/>삭제할까요?</p>
-        <p className="text-base text-[#6b7684] text-center">운동 기록도 함께 삭제됩니다</p>
+      <div className="bg-[#1a2026] rounded-3xl p-8 w-full max-w-sm flex flex-col items-center gap-5">
+        <p className="text-xl font-bold text-[#f0f0f0] text-center tracking-tight">{user.name}님의 정보를<br/>삭제할까요?</p>
+        <p className="text-base text-[#a0a0a0] text-center">운동 기록도 함께 삭제됩니다</p>
         <div className="flex gap-3 w-full">
-          <button onClick={onClose} className="flex-1 min-h-[52px] rounded-2xl bg-[#f2f4f6] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">취소</button>
-          <button onClick={onConfirm} className="flex-1 min-h-[52px] rounded-2xl bg-[#202632] text-white text-base font-semibold active:scale-95 transition-transform">삭제</button>
+          <button onClick={onClose} className="flex-1 min-h-[52px] rounded-2xl bg-[#14181d] text-base font-semibold text-[#a0a0a0] active:scale-95 transition-transform">취소</button>
+          <button onClick={onConfirm} className="flex-1 min-h-[52px] rounded-2xl bg-[#e05260] text-white text-base font-semibold active:scale-95 transition-transform">삭제</button>
         </div>
       </div>
     </div>
@@ -194,17 +194,17 @@ export default function DashboardPage() {
         <DeleteModal user={deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={() => handleDeleteUser(deleteTarget)} />
       )}
 
-      <main className="min-h-screen bg-[#f2f4f6] flex flex-col">
+      <main className="min-h-screen bg-[#14181d] flex flex-col">
 
         {/* 헤더 */}
-        <div className="bg-[#202632] px-6 pt-14 pb-6">
-          <p className="text-[#6b7684] text-sm mb-1">{today}</p>
+        <div className="bg-[#1a2026] px-6 pt-14 pb-6 border-b border-[#2a3139]">
+          <p className="text-[#a0a0a0] text-sm mb-1">{today}</p>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">관리자</h1>
-              <p className="text-[#6b7684] text-base mt-0.5">{facilityName || '행복노인복지관'}</p>
+              <h1 className="text-2xl font-bold text-[#f0f0f0] tracking-tight">관리자</h1>
+              <p className="text-[#a0a0a0] text-base mt-0.5">{facilityName || '행복노인복지관'}</p>
             </div>
-            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-white">
+            <div className="w-12 h-12 bg-[#23291a] rounded-2xl flex items-center justify-center text-[#d8ff36]">
               <BuildingIcon size={24} />
             </div>
           </div>
@@ -218,10 +218,10 @@ export default function DashboardPage() {
               { label:'오늘 운동',  value: data.todaySessions.length, unit:'회' },
               { label:'총 세트',   value: data.todaySets,            unit:'세트' },
             ].map(c => (
-              <div key={c.label} className="bg-white rounded-2xl border border-[#e5e8eb] p-4 text-center">
-                <p className="text-2xl font-bold text-[#0064ff] tabular-nums">{loading ? '·' : c.value}</p>
-                <p className="text-sm text-[#b0b8c1]">{c.unit}</p>
-                <p className="text-xs text-[#6b7684] mt-0.5">{c.label}</p>
+              <div key={c.label} className="bg-[#1a2026] rounded-2xl border border-[#2a3139] p-4 text-center">
+                <p className="text-2xl font-bold text-[#d8ff36] tabular-nums">{loading ? '·' : c.value}</p>
+                <p className="text-sm text-[#6a6a6a]">{c.unit}</p>
+                <p className="text-xs text-[#a0a0a0] mt-0.5">{c.label}</p>
               </div>
             ))}
           </div>
@@ -232,7 +232,7 @@ export default function DashboardPage() {
           {(['today','users'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 min-h-[46px] rounded-2xl text-base font-semibold transition-all
-                ${tab === t ? 'bg-[#202632] text-white' : 'bg-white border border-[#e5e8eb] text-[#6b7684]'}`}>
+                ${tab === t ? 'bg-[#d8ff36] text-[#14181d]' : 'bg-[#1a2026] border border-[#2a3139] text-[#a0a0a0]'}`}>
               {t === 'today' ? '오늘 현황' : '이용자'}
             </button>
           ))}
@@ -243,41 +243,41 @@ export default function DashboardPage() {
 
           {tab === 'today' && (
             <>
-              <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-                <p className="text-lg font-bold text-[#202632] mb-5">운동 종목별 현황</p>
+              <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] px-5 py-5">
+                <p className="text-lg font-bold text-[#f0f0f0] mb-5">운동 종목별 현황</p>
                 <div className="flex flex-col gap-4">
                   {breakdown.map(ex => (
                     <div key={ex.key} className="flex items-center gap-3">
-                      <span className="w-7 text-[#0064ff] shrink-0"><ExerciseIcon type={ex.key as ExerciseType} size={20} /></span>
-                      <span className="text-base text-[#6b7684] w-20 shrink-0">{ex.label}</span>
-                      <div className="flex-1 h-2 bg-[#f2f4f6] rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-[#0064ff] transition-all duration-500" style={{ width: `${(ex.count / maxCount) * 100}%` }} />
+                      <span className="w-7 text-[#d8ff36] shrink-0"><ExerciseIcon type={ex.key as ExerciseType} size={20} /></span>
+                      <span className="text-base text-[#a0a0a0] w-20 shrink-0">{ex.label}</span>
+                      <div className="flex-1 h-2 bg-[#14181d] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-[#d8ff36] transition-all duration-500" style={{ width: `${(ex.count / maxCount) * 100}%` }} />
                       </div>
-                      <span className="text-base font-bold text-[#202632] w-6 text-right tabular-nums">{ex.count}</span>
+                      <span className="text-base font-bold text-[#f0f0f0] w-6 text-right tabular-nums">{ex.count}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-                <p className="text-lg font-bold text-[#202632] mb-4">오늘 운동 기록</p>
+              <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] px-5 py-5">
+                <p className="text-lg font-bold text-[#f0f0f0] mb-4">오늘 운동 기록</p>
                 {data.todaySessions.length === 0 ? (
-                  <p className="text-base text-[#b0b8c1] text-center py-6">오늘 운동 기록이 없어요</p>
+                  <p className="text-base text-[#6a6a6a] text-center py-6">오늘 운동 기록이 없어요</p>
                 ) : (
-                  <div className="flex flex-col divide-y divide-[#f2f4f6]">
+                  <div className="flex flex-col divide-y divide-[#2a3139]">
                     {data.todaySessions.slice(0, 10).map(s => {
                       const meta = EX[s.exercise_type] ?? { label: s.exercise_type };
                       const known = !!EX[s.exercise_type];
                       return (
                         <div key={s.id} className="flex items-center gap-4 py-3.5">
-                          <span className="w-9 h-9 rounded-lg bg-[#ebf3ff] text-[#0064ff] flex items-center justify-center shrink-0">
+                          <span className="w-9 h-9 rounded-lg bg-[#23291a] text-[#d8ff36] flex items-center justify-center shrink-0">
                             {known ? <ExerciseIcon type={s.exercise_type as ExerciseType} size={20} /> : <RunIcon size={20} />}
                           </span>
                           <div className="flex-1">
-                            <p className="text-lg font-semibold text-[#202632]">{s.users?.name ?? '이용자'}</p>
-                            <p className="text-sm text-[#6b7684]">{meta.label} · {s.sets_completed}세트</p>
+                            <p className="text-lg font-semibold text-[#f0f0f0]">{s.users?.name ?? '이용자'}</p>
+                            <p className="text-sm text-[#a0a0a0]">{meta.label} · {s.sets_completed}세트</p>
                           </div>
-                          <p className="text-sm text-[#b0b8c1] tabular-nums">
+                          <p className="text-sm text-[#6a6a6a] tabular-nums">
                             {new Date(s.started_at).toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', hour12: false })}
                           </p>
                         </div>
@@ -292,21 +292,21 @@ export default function DashboardPage() {
           {tab === 'users' && (
             <>
               <button onClick={() => setShowRegister(true)}
-                className="w-full min-h-[52px] rounded-2xl bg-[#0064ff] text-white text-base font-bold active:scale-95 transition-transform flex items-center justify-center gap-2">
+                className="w-full min-h-[52px] rounded-2xl bg-[#d8ff36] text-[#14181d] text-base font-bold active:scale-95 transition-transform flex items-center justify-center gap-2">
                 <span className="text-xl font-light">+</span> 이용자 등록
               </button>
 
-              <div className="bg-white rounded-2xl border border-[#e5e8eb] overflow-hidden">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-[#f2f4f6]">
-                  <p className="text-lg font-bold text-[#202632]">이용자 목록</p>
-                  <span className="text-sm text-[#b0b8c1]">{data.users.length}명</span>
+              <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] overflow-hidden">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a3139]">
+                  <p className="text-lg font-bold text-[#f0f0f0]">이용자 목록</p>
+                  <span className="text-sm text-[#6a6a6a]">{data.users.length}명</span>
                 </div>
                 {data.users.length === 0 ? (
                   <div className="flex flex-col items-center py-10 gap-3">
-                    <p className="text-base text-[#b0b8c1]">등록된 이용자가 없어요</p>
+                    <p className="text-base text-[#6a6a6a]">등록된 이용자가 없어요</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col divide-y divide-[#f2f4f6]">
+                  <div className="flex flex-col divide-y divide-[#2a3139]">
                     {data.users.map(u => {
                       const age = u.birth_year ? new Date().getFullYear() - u.birth_year : null;
                       const exercisedToday = data.todaySessions.some(s => s.user_id === u.id);
@@ -314,23 +314,23 @@ export default function DashboardPage() {
                         <div key={u.id} className="flex items-center gap-4 px-5 py-4">
                           <button
                             onClick={() => { sessionStorage.setItem(`wm_admin_user_${u.id}`, JSON.stringify({ name: u.name })); router.push(`/dashboard/users/${u.id}`); }}
-                            className="w-11 h-11 rounded-full bg-[#ebf3ff] flex items-center justify-center shrink-0 active:opacity-70 transition-opacity">
-                            <span className="text-lg font-bold text-[#0064ff]">{u.name[0]}</span>
+                            className="w-11 h-11 rounded-full bg-[#23291a] flex items-center justify-center shrink-0 active:opacity-70 transition-opacity">
+                            <span className="text-lg font-bold text-[#d8ff36]">{u.name[0]}</span>
                           </button>
                           <button
                             onClick={() => { sessionStorage.setItem(`wm_admin_user_${u.id}`, JSON.stringify({ name: u.name })); router.push(`/dashboard/users/${u.id}`); }}
                             className="flex-1 min-w-0 text-left active:opacity-70 transition-opacity">
                             <div className="flex items-center gap-2">
-                              <p className="text-lg font-semibold text-[#202632]">{u.name}</p>
-                              {u.pin && <span className="text-xs bg-[#f2f4f6] text-[#6b7684] px-2 py-0.5 rounded-lg font-mono">PIN {u.pin}</span>}
+                              <p className="text-lg font-semibold text-[#f0f0f0]">{u.name}</p>
+                              {u.pin && <span className="text-xs bg-[#14181d] text-[#a0a0a0] px-2 py-0.5 rounded-lg font-mono">PIN {u.pin}</span>}
                             </div>
-                            <p className="text-sm text-[#b0b8c1] mt-0.5">{age ? `${age}세` : '나이 미입력'}</p>
+                            <p className="text-sm text-[#6a6a6a] mt-0.5">{age ? `${age}세` : '나이 미입력'}</p>
                           </button>
                           <div className="flex flex-col items-end gap-2 shrink-0">
-                            <span className={`text-sm px-2.5 py-1 rounded-full font-semibold ${exercisedToday ? 'bg-[#ebf3ff] text-[#0064ff]' : 'bg-[#f2f4f6] text-[#b0b8c1]'}`}>
+                            <span className={`text-sm px-2.5 py-1 rounded-full font-semibold ${exercisedToday ? 'bg-[#23291a] text-[#d8ff36]' : 'bg-[#14181d] text-[#6a6a6a]'}`}>
                               {exercisedToday ? '완료' : '미운동'}
                             </span>
-                            <button onClick={() => setDeleteTarget(u)} className="text-sm text-[#6b7684] active:opacity-60 px-1">삭제</button>
+                            <button onClick={() => setDeleteTarget(u)} className="text-sm text-[#a0a0a0] active:opacity-60 px-1">삭제</button>
                           </div>
                         </div>
                       );
@@ -343,8 +343,8 @@ export default function DashboardPage() {
         </div>
 
         {/* 로그아웃 */}
-        <div className="px-5 pb-12 pt-2 border-t border-[#e5e8eb] bg-[#f2f4f6]">
-          <button onClick={logout} className="w-full min-h-[52px] rounded-2xl bg-white border border-[#e5e8eb] text-base font-semibold text-[#6b7684] active:scale-95 transition-transform">
+        <div className="px-5 pb-12 pt-2 border-t border-[#2a3139] bg-[#14181d]">
+          <button onClick={logout} className="w-full min-h-[52px] rounded-2xl bg-[#1a2026] border border-[#2a3139] text-base font-semibold text-[#a0a0a0] active:scale-95 transition-transform">
             로그아웃
           </button>
         </div>

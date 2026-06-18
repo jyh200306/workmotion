@@ -72,13 +72,13 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
   const g        = GUIDES[exType];
 
   return (
-    <main className="min-h-screen bg-[#f2f4f6] flex flex-col">
+    <main className="min-h-screen bg-[#14181d] flex flex-col">
 
       {/* 헤더 */}
-      <div className="bg-white px-6 pt-14 pb-6 border-b border-[#f2f4f6]">
+      <div className="bg-[#1a2026] px-6 pt-14 pb-6 border-b border-[#2a3139]">
         <button
           onClick={() => router.push('/exercise')}
-          className="flex items-center gap-1.5 text-base text-[#6b7684] mb-5 active:opacity-60 transition-opacity"
+          className="flex items-center gap-1.5 text-base text-[#a0a0a0] mb-5 active:opacity-60 transition-opacity"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -86,51 +86,51 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
           운동 선택
         </button>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#ebf3ff] text-[#0064ff]">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-[#23291a] text-[#d8ff36]">
             <ExerciseIcon type={exType} size={26} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#202632] tracking-tight">{g.name}</h1>
-            <p className="text-base text-[#6b7684] mt-0.5">{g.duration}</p>
+            <h1 className="text-2xl font-bold text-[#f0f0f0] tracking-tight">{g.name}</h1>
+            <p className="text-base text-[#a0a0a0] mt-0.5">{g.duration}</p>
           </div>
         </div>
-        <div className="mt-4 inline-flex items-center gap-2 bg-[#f2f4f6] rounded-xl px-4 py-2">
-          <span className="text-sm text-[#6b7684]">운동 부위</span>
-          <span className="text-sm font-semibold text-[#202632]">{g.target}</span>
+        <div className="mt-4 inline-flex items-center gap-2 bg-[#14181d] rounded-xl px-4 py-2">
+          <span className="text-sm text-[#a0a0a0]">운동 부위</span>
+          <span className="text-sm font-semibold text-[#f0f0f0]">{g.target}</span>
         </div>
       </div>
 
       <div className="flex-1 px-5 py-5 flex flex-col gap-4 overflow-y-auto">
 
         {/* 효과 */}
-        <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-          <p className="text-sm text-[#6b7684] mb-1">이 운동의 효과</p>
-          <p className="text-lg font-semibold text-[#202632] leading-snug">{g.benefit}</p>
+        <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] px-5 py-5">
+          <p className="text-sm text-[#a0a0a0] mb-1">이 운동의 효과</p>
+          <p className="text-lg font-semibold text-[#f0f0f0] leading-snug">{g.benefit}</p>
         </div>
 
         {/* 동작 순서 */}
-        <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-          <p className="text-lg font-bold text-[#202632] mb-4">동작 순서</p>
+        <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] px-5 py-5">
+          <p className="text-lg font-bold text-[#f0f0f0] mb-4">동작 순서</p>
           <div className="flex flex-col gap-4">
             {g.steps.map((s, i) => (
               <div key={i} className="flex items-start gap-4">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-[#ebf3ff]">
-                  <span className="text-sm font-bold text-[#0064ff]">{i + 1}</span>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-[#23291a]">
+                  <span className="text-sm font-bold text-[#d8ff36]">{i + 1}</span>
                 </div>
-                <p className="text-base text-[#202632] leading-relaxed flex-1 pt-0.5">{s.text}</p>
+                <p className="text-base text-[#f0f0f0] leading-relaxed flex-1 pt-0.5">{s.text}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* 주의사항 */}
-        <div className="bg-white rounded-2xl border border-[#e5e8eb] px-5 py-5">
-          <p className="text-lg font-bold text-[#202632] mb-4">주의사항</p>
+        <div className="bg-[#1a2026] rounded-2xl border border-[#2a3139] px-5 py-5">
+          <p className="text-lg font-bold text-[#f0f0f0] mb-4">주의사항</p>
           <div className="flex flex-col gap-3">
             {g.cautions.map((c, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#202632] text-white text-sm font-bold shrink-0 mt-0.5 flex items-center justify-center">!</span>
-                <p className="text-base text-[#202632] leading-relaxed">{c}</p>
+                <span className="w-6 h-6 rounded-full bg-[#ffb84d] text-[#14181d] text-sm font-bold shrink-0 mt-0.5 flex items-center justify-center">!</span>
+                <p className="text-base text-[#f0f0f0] leading-relaxed">{c}</p>
               </div>
             ))}
           </div>
@@ -141,13 +141,13 @@ export default function GuidePage({ params }: { params: Promise<{ type: string }
       <div className="px-5 pb-12 pt-3">
         <button
           onClick={() => router.push(`/exercise/${exType}`)}
-          className="w-full min-h-[56px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold
+          className="w-full min-h-[56px] rounded-2xl bg-[#d8ff36] text-[#14181d] text-lg font-bold
                      active:scale-95 transition-transform flex items-center justify-center gap-2.5"
         >
           <CameraIcon size={22} />
           카메라로 운동 시작
         </button>
-        <p className="text-center text-sm text-[#b0b8c1] mt-3">카메라가 자세를 실시간으로 안내해요</p>
+        <p className="text-center text-sm text-[#6a6a6a] mt-3">카메라가 자세를 실시간으로 안내해요</p>
       </div>
     </main>
   );

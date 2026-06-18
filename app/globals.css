@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand:       #0064ff;
-  --color-brand-dark:  #0055d4;
-  --color-brand-bg:    #ebf3ff;
-  --color-ink:         #202632;
-  --color-ink-sub:     #6b7684;
-  --color-ink-muted:   #b0b8c1;
-  --color-surface:     #f2f4f6;
-  --color-border:      #e5e8eb;
-  /* 화이트·블루·그레이·블랙 팔레트로 통일 (의미색 → 단색 체계) */
-  --color-success:     #0064ff;  /* 완료/긍정 → 브랜드 블루 */
-  --color-error:       #202632;  /* 경고/삭제 → 잉크(블랙) */
-  --color-warn:        #6b7684;   /* 주의 → 그레이 */
+  /* 다크 + 네온 라임 팔레트 — 라임은 포인트로만, 넓은 면적은 다크 회색 */
+  --color-brand:       #d8ff36;  /* 포인트(라임) → 버튼·선택·진행바·강조 */
+  --color-brand-dark:  #b8df16;
+  --color-brand-bg:    #23291a;  /* 라임 톤 다크 배경(선택 강조 면) */
+  --color-ink:         #f0f0f0;  /* 본문 텍스트 */
+  --color-ink-sub:     #a0a0a0;  /* 보조 텍스트 */
+  --color-ink-muted:   #6a6a6a;  /* 흐린 텍스트 */
+  --color-surface:     #14181d;  /* 페이지 배경 */
+  --color-card:        #1a2026;  /* 카드/표면 */
+  --color-border:      #2a3139;
+  --color-success:     #d8ff36;  /* 완료/긍정 → 라임 */
+  --color-error:       #e05260;  /* 경고/삭제 → 레드 */
+  --color-warn:        #ffb84d;  /* 주의 → 주황 */
 }
 
 * {
@@ -22,8 +23,8 @@
 
 body {
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: #f2f4f6;
-  color: #202632;
+  background: #14181d;
+  color: #f0f0f0;
   overscroll-behavior: none;
   /* 모던한 타이포 기본값: 글자 간격 살짝 좁히고 줄간격 정돈 */
   letter-spacing: -0.01em;

@@ -8,9 +8,9 @@ interface SeniorButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClass = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700',
-  secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-  danger: 'bg-red-500 text-white hover:bg-red-600',
+  primary: 'bg-[#d8ff36] text-[#14181d] active:bg-[#b8df16]',
+  secondary: 'bg-[#2a3139] text-[#f0f0f0] active:bg-[#343c45]',
+  danger: 'bg-[#e05260] text-white active:bg-[#c8404d]',
 };
 
 const sizeClass = {

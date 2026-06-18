@@ -5,7 +5,7 @@
 // MediaPipe 가 추정한 관절 좌표(0~1 정규화)를 카메라 영상 위에 그립니다.
 // SilhouetteOverlay(고정 가이드 자세)와 별개로, "지금 내 몸"을 그리는 레이어입니다.
 //
-// ⚠️ 떨림 보정(EMA 스무딩)은 "그리기 직전"에만 적용합니다.
+// [주의] 떨림 보정(EMA 스무딩)은 "그리기 직전"에만 적용합니다.
 //    각도 계산·반복 카운트에 쓰는 원본 좌표(usePoseCounter 의 landmarks)는 손대지 않습니다.
 //
 // 좌표 정렬:
@@ -108,7 +108,7 @@ export function PoseSkeletonOverlay({
   });
 
   const base = Math.min(box.w, box.h); // 두께 기준(짧은 변)
-  const color = correctForm ? '#4d94ff' : '#ffb84d';
+  const color = correctForm ? '#d8ff36' : '#ffb84d';
 
   return (
     <div

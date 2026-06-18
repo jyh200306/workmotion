@@ -56,17 +56,17 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white flex flex-col select-none">
+    <main className="min-h-screen bg-[#14181d] flex flex-col select-none">
 
       {/* 상단 영역 */}
       <div className="flex flex-col items-center pt-20 pb-10 px-8">
-        <div className="w-14 h-14 bg-[#0064ff] rounded-2xl flex items-center justify-center mb-5">
+        <div className="w-14 h-14 bg-[#d8ff36] rounded-2xl flex items-center justify-center mb-5">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="white" strokeLinejoin="round"/>
+            <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="#14181d" strokeLinejoin="round"/>
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[#202632] tracking-tight">WorkMotion</h1>
-        <p className="text-base text-[#6b7684] mt-2">PIN 번호 4자리를 눌러주세요</p>
+        <h1 className="text-2xl font-bold text-[#f0f0f0] tracking-tight">WorkMotion</h1>
+        <p className="text-base text-[#a0a0a0] mt-2">PIN 번호 4자리를 눌러주세요</p>
       </div>
 
       {/* PIN 도트 */}
@@ -76,8 +76,8 @@ export default function LoginPage() {
             key={i}
             className={`w-4 h-4 rounded-full transition-all duration-150 ${
               i < pin.length
-                ? `bg-[#0064ff] ${filled === i ? 'pin-fill' : ''}`
-                : 'bg-[#e5e8eb]'
+                ? `bg-[#d8ff36] ${filled === i ? 'pin-fill' : ''}`
+                : 'bg-[#2a3139]'
             }`}
           />
         ))}
@@ -85,8 +85,8 @@ export default function LoginPage() {
 
       {/* 에러 */}
       <div className="h-9 flex items-center justify-center px-8">
-        {error   && <p className="text-base text-[#202632] font-semibold">{error}</p>}
-        {loading && <p className="text-base text-[#b0b8c1]">확인 중</p>}
+        {error   && <p className="text-base text-[#e05260] font-semibold">{error}</p>}
+        {loading && <p className="text-base text-[#a0a0a0]">확인 중</p>}
       </div>
 
       {/* 키패드 */}
@@ -100,8 +100,8 @@ export default function LoginPage() {
               className={`min-h-[68px] rounded-2xl text-2xl font-semibold transition-all duration-100 active:scale-90
                 ${key === '' ? 'invisible' : ''}
                 ${key === '←'
-                  ? 'bg-[#f2f4f6] text-[#6b7684] text-xl'
-                  : 'bg-[#f2f4f6] text-[#202632] active:bg-[#e5e8eb]'}
+                  ? 'bg-[#1a2026] text-[#a0a0a0] text-xl'
+                  : 'bg-[#1a2026] text-[#f0f0f0] active:bg-[#2a3139]'}
                 disabled:opacity-40`}
             >
               {key}
@@ -110,7 +110,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <p className="text-center text-sm text-[#b0b8c1] pb-12">WorkMotion © 2026</p>
+      <p className="text-center text-sm text-[#6a6a6a] pb-12">WorkMotion © 2026</p>
     </main>
   );
 }

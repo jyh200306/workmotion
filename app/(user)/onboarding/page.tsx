@@ -94,19 +94,19 @@ export default function OnboardingPage() {
   const goalLabel = GOALS.find(g => g.id === data.goal)?.label ?? '';
 
   return (
-    <main className="min-h-screen bg-white flex flex-col select-none">
+    <main className="min-h-screen bg-[#14181d] flex flex-col select-none">
 
       {/* 진행 바 */}
-      <div className="h-1 bg-[#f2f4f6]">
-        <div className="h-full bg-[#0064ff] transition-all duration-300" style={{ width: `${progress}%` }} />
+      <div className="h-1 bg-[#2a3139]">
+        <div className="h-full bg-[#d8ff36] transition-all duration-300" style={{ width: `${progress}%` }} />
       </div>
 
       {/* 헤더 (intro·loading 제외) */}
       {key !== 'intro' && key !== 'loading' && (
         <div className="px-6 pt-12 pb-6 flex items-center justify-between">
-          <span className="text-xl font-semibold text-[#b0b8c1]">{step} / {STEPS.length - 2}</span>
+          <span className="text-xl font-semibold text-[#6a6a6a]">{step} / {STEPS.length - 2}</span>
           <button onClick={() => setStep(s => Math.max(0, s - 1))}
-            className="text-xl text-[#6b7684] active:opacity-60 transition-opacity">
+            className="text-xl text-[#a0a0a0] active:opacity-60 transition-opacity">
             이전
           </button>
         </div>
@@ -118,16 +118,16 @@ export default function OnboardingPage() {
         {/* 인트로 */}
         {key === 'intro' && (
           <div className="flex flex-col items-center justify-center flex-1 gap-8 text-center pb-8">
-            <div className="w-20 h-20 bg-[#0064ff] rounded-3xl flex items-center justify-center">
+            <div className="w-20 h-20 bg-[#d8ff36] rounded-3xl flex items-center justify-center">
               <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
-                <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="white" strokeLinejoin="round" />
+                <path d="M13 3L4 14h8l-1 7 9-11h-8l1-10z" fill="#14181d" strokeLinejoin="round" />
               </svg>
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#202632] leading-tight tracking-tight mb-3">
+              <p className="text-2xl font-bold text-[#f0f0f0] leading-tight tracking-tight mb-3">
                 워크모션 AI 코치<br />연호입니다
               </p>
-              <p className="text-base text-[#6b7684] leading-relaxed">
+              <p className="text-base text-[#a0a0a0] leading-relaxed">
                 몇 가지만 여쭤보고<br />회원님께 맞는 운동을 준비할게요
               </p>
             </div>
@@ -146,11 +146,11 @@ export default function OnboardingPage() {
                 placeholder="홍길동"
                 maxLength={10}
                 autoFocus
-                className="w-full border-b-2 border-[#e5e8eb] bg-transparent text-xl font-semibold
-                           text-[#202632] py-3 placeholder-[#b0b8c1] focus:outline-none
-                           focus:border-[#0064ff] transition-colors"
+                className="w-full border-b-2 border-[#2a3139] bg-transparent text-xl font-semibold
+                           text-[#f0f0f0] py-3 placeholder-[#6a6a6a] focus:outline-none
+                           focus:border-[#d8ff36] transition-colors"
               />
-              {nameError && <p className="text-base text-[#202632] font-semibold mt-1">{nameError}</p>}
+              {nameError && <p className="text-base text-[#e05260] font-semibold mt-1">{nameError}</p>}
             </div>
           </>
         )}
@@ -165,9 +165,9 @@ export default function OnboardingPage() {
                   key={g.id}
                   onClick={() => pick('gender', g.id)}
                   className={`flex items-center justify-center py-8 rounded-2xl border-2 transition-all duration-150 active:scale-[0.98]
-                    ${data.gender === g.id ? 'border-[#0064ff] bg-[#ebf3ff]' : 'border-[#e5e8eb] bg-white'}`}
+                    ${data.gender === g.id ? 'border-[#d8ff36] bg-[#23291a]' : 'border-[#2a3139] bg-[#1a2026]'}`}
                 >
-                  <span className={`text-xl font-bold ${data.gender === g.id ? 'text-[#0064ff]' : 'text-[#202632]'}`}>
+                  <span className={`text-xl font-bold ${data.gender === g.id ? 'text-[#d8ff36]' : 'text-[#f0f0f0]'}`}>
                     {g.label}
                   </span>
                 </button>
@@ -211,12 +211,12 @@ export default function OnboardingPage() {
         {/* AI 로딩 연출 */}
         {key === 'loading' && (
           <div className="flex flex-col items-center justify-center flex-1 gap-7 text-center pb-8">
-            <div className="w-16 h-16 rounded-full border-4 border-[#ebf3ff] border-t-[#0064ff] animate-spin" />
+            <div className="w-16 h-16 rounded-full border-4 border-[#2a3139] border-t-[#d8ff36] animate-spin" />
             <div>
-              <p className="text-2xl font-bold text-[#202632] mb-3 tracking-tight">
+              <p className="text-2xl font-bold text-[#f0f0f0] mb-3 tracking-tight">
                 {data.name ? `${data.name}님을 위한` : '회원님을 위한'}<br />맞춤 플랜을 구성중이에요
               </p>
-              <p className="text-base text-[#6b7684] leading-relaxed">
+              <p className="text-base text-[#a0a0a0] leading-relaxed">
                 {goalLabel && `${goalLabel} · `}AI 코치 연호가<br />운동을 정리하고 있어요
               </p>
             </div>
@@ -231,7 +231,7 @@ export default function OnboardingPage() {
             onClick={goNext}
             disabled={key === 'name' && !data.name.trim()}
             className="w-full min-h-[56px] rounded-2xl text-lg font-bold transition-all duration-150
-                       active:scale-95 bg-[#0064ff] text-white disabled:bg-[#b0b8c1]"
+                       active:scale-95 bg-[#d8ff36] text-[#14181d] disabled:bg-[#2a3139] disabled:text-[#6a6a6a]"
           >
             {key === 'intro' ? '시작하기' : '다음'}
           </button>
@@ -246,8 +246,8 @@ export default function OnboardingPage() {
 function Title({ lead, main }: { lead?: string; main: string }) {
   return (
     <div className="mb-8">
-      {lead && <p className="text-2xl font-bold text-[#202632] leading-tight tracking-tight">{lead}</p>}
-      <p className="text-2xl font-bold text-[#202632] leading-tight tracking-tight">{main}</p>
+      {lead && <p className="text-2xl font-bold text-[#f0f0f0] leading-tight tracking-tight">{lead}</p>}
+      <p className="text-2xl font-bold text-[#f0f0f0] leading-tight tracking-tight">{main}</p>
     </div>
   );
 }
@@ -268,20 +268,20 @@ function OptionList<T extends string | number>({
             key={String(o.id)}
             onClick={() => onPick(o.id)}
             className={`flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-150 active:scale-[0.98] text-left
-              ${active ? 'border-[#0064ff] bg-[#ebf3ff]' : 'border-[#e5e8eb] bg-white'}`}
+              ${active ? 'border-[#d8ff36] bg-[#23291a]' : 'border-[#2a3139] bg-[#1a2026]'}`}
           >
             {o.Icon && (
-              <span className={`shrink-0 ${active ? 'text-[#0064ff]' : 'text-[#b0b8c1]'}`}>
+              <span className={`shrink-0 ${active ? 'text-[#d8ff36]' : 'text-[#6a6a6a]'}`}>
                 <o.Icon size={34} />
               </span>
             )}
             <div className="flex-1 min-w-0">
-              <p className={`text-lg font-bold ${active ? 'text-[#0064ff]' : 'text-[#202632]'}`}>{o.label}</p>
-              {o.desc && <p className="text-sm text-[#6b7684] mt-0.5">{o.desc}</p>}
+              <p className={`text-lg font-bold ${active ? 'text-[#d8ff36]' : 'text-[#f0f0f0]'}`}>{o.label}</p>
+              {o.desc && <p className="text-sm text-[#a0a0a0] mt-0.5">{o.desc}</p>}
             </div>
             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all
-              ${active ? 'bg-[#0064ff] border-[#0064ff]' : 'border-[#b0b8c1]'}`}>
-              {active && <div className="w-2 h-2 rounded-full bg-white" />}
+              ${active ? 'bg-[#d8ff36] border-[#d8ff36]' : 'border-[#6a6a6a]'}`}>
+              {active && <div className="w-2 h-2 rounded-full bg-[#14181d]" />}
             </div>
           </button>
         );
