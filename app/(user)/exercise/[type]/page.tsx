@@ -80,9 +80,8 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   const onSetDoneRef = useRef<() => void>(() => {});
 
-  // 목표 반복을 채우면 즉시 세트 완료 처리
+  // 목표 반복을 채우면 즉시 세트 완료 처리 (횟수 카운트 음성은 없음 — 피드백 음성만 사용)
   const handleRep = useCallback((total: number) => {
-    speak(String(total));
     if (total >= goalReps) onSetDoneRef.current();
   }, [goalReps]);
 
