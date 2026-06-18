@@ -37,16 +37,17 @@ const TIPS: Record<ExerciseType, string> = {
 };
 
 const VALID: ExerciseType[] = ['squat', 'deadlift', 'lunge', 'hip_hinge'];
-const TOTAL_SETS = 3;
-const SET_SEC    = 20;
-const REST_SEC   = 8;
+const TOTAL_SETS    = 3;
+const SET_SEC       = 20;
+const REST_SEC      = 8;
+const COUNTDOWN_SEC = 5;  // 운동 시작 전 준비 카운트다운
 
 // 한 세트 목표 반복 횟수 — 자세 인식이 동작할 때 이 횟수를 채우면 세트 완료
 const REPS_PER_SET: Record<ExerciseType, number> = {
   squat: 8, deadlift: 8, lunge: 10, hip_hinge: 10,
 };
 
-type Stage = 'ready' | 'exercise' | 'rest' | 'done';
+type Stage = 'ready' | 'countdown' | 'exercise' | 'rest' | 'done';
 
 export default function ExerciseSessionPage({ params }: { params: Promise<{ type: string }> }) {
   const { type } = use(params);
@@ -57,6 +58,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   const [stage,      setStage]      = useState<Stage>('ready');
   const [sets,       setSets]       = useState(0);
   const [timeLeft,   setTimeLeft]   = useState(SET_SEC);
+  const [countdown,  setCountdown]  = useState(COUNTDOWN_SEC); // 시작 전 5초 카운트다운 표시
   const [paused,     setPaused]     = useState(false);
   const [isSenior,   setIsSenior]   = useState(false); // 60세 이상 → 완화 임계값 (mvp.md)
 
@@ -69,6 +71,7 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
   }, []);
 
   const intervalRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
 
   // ── 실시간 자세 인식 ────────────────────────────────────
@@ -122,7 +125,17 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
     }, 1000);
   }, []);
 
-  useEffect(() => () => clearTimer(), []);
+  // 카운트다운 타이머 정리 (메모리 누수 방지)
+  const clearCountdown = useCallback(() => {
+    if (countdownRef.current) { clearInterval(countdownRef.current); countdownRef.current = null; }
+  }, []);
+
+  // 언마운트 시 모든 타이머·음성 정리
+  useEffect(() => () => {
+    clearTimer();
+    clearCountdown();
+    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+  }, [clearCountdown]);
 
   const completingRef = useRef(false); // 세트 완료 중복 처리 가드
 
@@ -156,14 +169,50 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
 
   useEffect(() => { onSetDoneRef.current = onSetDone; }, [onSetDone]);
 
-  function handleStart() {
+  // ── 시작 전 5초 카운트다운 → "운동 시작" 음성 → 실제 운동 시작 ──────────
+
+  // 실제 운동 시작 로직 (카메라 자세 인식 + 세트 타이머)
+  const beginExercise = useCallback(() => {
     startTimeRef.current = Date.now();
     completingRef.current = false;
     pose.resetReps();
     setStage('exercise');
-    speak(`${info.name} 시작합니다`);
-    startCountdown(SET_SEC, onSetDone);
-  }
+    startCountdown(SET_SEC, onSetDoneRef.current);
+  }, [pose, startCountdown]);
+
+  // 의존성 순환을 피하기 위해 ref로 참조 (onSetDoneRef 패턴과 동일)
+  const beginExerciseRef = useRef<() => void>(() => {});
+  useEffect(() => { beginExerciseRef.current = beginExercise; }, [beginExercise]);
+
+  // 숫자 갱신만 담당하는 순수 틱 로직 (함수형 분리)
+  const tickCountdown = useCallback(() => {
+    setCountdown(prev => {
+      if (prev <= 1) {        // 0 도달 → 카운트다운 종료, 음성 끝난 직후 운동 시작
+        clearCountdown();
+        speak('운동 시작', { onEnd: () => beginExerciseRef.current() });
+        return 0;
+      }
+      speak(String(prev - 1)); // "4","3","2","1" 안내
+      return prev - 1;
+    });
+  }, [clearCountdown]);
+
+  // 시작 버튼: ready → 카운트다운 시작 / countdown 중 재클릭 → 취소·초기화
+  const handleStartButton = useCallback(() => {
+    if (stage === 'countdown') {        // 재클릭 → 중단·초기화
+      clearCountdown();
+      if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+      setCountdown(COUNTDOWN_SEC);
+      setStage('ready');
+      return;
+    }
+    // ready → 카운트다운 시작
+    clearCountdown();
+    setCountdown(COUNTDOWN_SEC);
+    setStage('countdown');
+    speak('5');                          // 첫 숫자 즉시 안내
+    countdownRef.current = setInterval(tickCountdown, 1000);
+  }, [stage, clearCountdown, tickCountdown]);
 
   function togglePause() {
     if (paused) {
@@ -278,6 +327,18 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
           </div>
         )}
 
+        {/* 시작 전 5초 카운트다운 오버레이 (전체 화면) */}
+        {stage === 'countdown' && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center
+                          bg-black/60 backdrop-blur-sm pointer-events-none">
+            <p className="text-white/70 text-lg mb-2">잠시 후 시작합니다</p>
+            <span key={countdown}
+              className="text-white text-[120px] font-bold leading-none tabular-nums animate-[pop_0.4s_ease-out]">
+              {countdown === 0 ? '시작!' : countdown}
+            </span>
+          </div>
+        )}
+
         {/* 완료 오버레이 */}
         {stage === 'done' && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/70">
@@ -297,10 +358,11 @@ export default function ExerciseSessionPage({ params }: { params: Promise<{ type
       {/* 컨트롤 */}
       <div className="bg-[#111] px-5 pt-4 pb-8 shrink-0 flex flex-col gap-3">
 
-        {stage === 'ready' && (
-          <button onClick={handleStart}
-            className="w-full min-h-[60px] rounded-2xl bg-[#0064ff] text-white text-lg font-bold active:scale-95 transition-transform">
-            운동 시작
+        {(stage === 'ready' || stage === 'countdown') && (
+          <button onClick={handleStartButton}
+            className={`w-full min-h-[60px] rounded-2xl text-white text-lg font-bold active:scale-95 transition-transform
+                        ${stage === 'countdown' ? 'bg-white/10' : 'bg-[#0064ff]'}`}>
+            {stage === 'countdown' ? '취소' : '운동 시작'}
           </button>
         )}
 
