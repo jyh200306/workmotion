@@ -13,6 +13,7 @@ type Option<T> = { id: T; label: string; desc?: string; Icon?: OptIcon };
 const GENDERS: Option<string>[] = [
   { id: 'male',   label: '남성' },
   { id: 'female', label: '여성' },
+  { id: 'other',  label: '기타' },
 ];
 
 const LEVELS: Option<string>[] = [
@@ -37,8 +38,8 @@ const FREQUENCIES: Option<number>[] = [
 
 const ENVIRONMENTS: Option<string>[] = [
   { id: 'gym',        label: '헬스장 기구', desc: '헬스장에서 운동해요',       Icon: BuildingIcon },
-  { id: 'home',       label: '홈 짐 기구',  desc: '집에 운동 기구가 있어요',   Icon: RunIcon },
-  { id: 'tools',      label: '소도구',      desc: '의자나 밴드 등을 활용해요', Icon: PoseIcon },
+  { id: 'home',       label: '홈 짐 기구',  desc: '바벨, 덤벨, 머신 등 다양한 기구가 있어요',          Icon: RunIcon },
+  { id: 'tools',      label: '소도구',      desc: '덤벨, 케틀벨, 밴드 등의 간단한 기구가 있어요', Icon: PoseIcon },
   { id: 'bodyweight', label: '맨몸 운동',   desc: '기구 없이 몸만 써요',       Icon: PoseIcon },
 ];
 
@@ -201,7 +202,7 @@ export default function OnboardingPage() {
         {key === 'gender' && (
           <>
             <Title main={data.name ? `${data.name}님, ${TITLES.gender.main}` : TITLES.gender.main} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {GENDERS.map(g => (
                 <button
                   key={g.id}
@@ -250,7 +251,7 @@ export default function OnboardingPage() {
                 type="number"
                 value={data.height}
                 onChange={e => setField('height', e.target.value)}
-                placeholder="170"
+                placeholder=""
                 autoFocus
                 className="flex-1 bg-transparent text-xl font-semibold text-[#f0f0f0] py-2
                            placeholder-[#6a6a6a] focus:outline-none"
@@ -269,7 +270,7 @@ export default function OnboardingPage() {
                 type="number"
                 value={data.weight}
                 onChange={e => setField('weight', e.target.value)}
-                placeholder="65"
+                placeholder=""
                 autoFocus
                 className="flex-1 bg-transparent text-xl font-semibold text-[#f0f0f0] py-2
                            placeholder-[#6a6a6a] focus:outline-none"
